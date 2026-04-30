@@ -35,9 +35,9 @@ export const OpenMRSProvider = ({ children }) => {
   const [credentials, setCredentials] = useState({
     username: 'admin',
     password: 'Admin123',
-    baseUrl: 'https://o2.openmrs.org/openmrs',
+    baseUrl: 'http://localhost/openmrs', //'https://o2.openmrs.org/openmrs',
   })
-  
+
   const [settings, setSettings] = useState(loadSettings)
   const [isConnected, setIsConnected] = useState(false)
   const [connectionError, setConnectionError] = useState(null)

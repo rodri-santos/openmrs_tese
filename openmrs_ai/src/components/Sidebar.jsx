@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom' // <-- 1. IMPORTAMOS O useNavigate AQUI
 import {
   Box,
   VStack,
@@ -25,7 +26,7 @@ import {
   IconButton,
   useDisclosure,
 } from '@chakra-ui/react'
-import { FaEye, FaEyeSlash, FaSearch, FaCog } from 'react-icons/fa'
+import { FaEye, FaEyeSlash, FaSearch, FaCog, FaRobot } from 'react-icons/fa' // Adicionei também o FaRobot para o botão do CAG
 import { useOpenMRS } from '../contexts/OpenMRSContext'
 import createOpenMrsApi from '../services/openMrsService'
 import { useQuery } from 'react-query'
@@ -34,6 +35,8 @@ import SettingsModal from './SettingsModal'
 
 const Sidebar = () => {
   const toast = useToast()
+  const navigate = useNavigate() // <-- 2. INICIALIZAMOS O HOOK AQUI
+
   const {
     credentials,
     updateCredentials,
@@ -154,7 +157,7 @@ const Sidebar = () => {
         <Box>
           <Flex align="center" justify="space-between" mb={4}>
             <Heading size="md">
-              OpenMRS Connection
+              OpenMRS Connections
               {settings.mockData && isLocalDevelopment ? (
                 <Tag size="sm" colorScheme="green" ml={2}>
                   Mock Data
@@ -319,6 +322,31 @@ const Sidebar = () => {
             </Box>
           </>
         )}
+
+        {/* --- 3. NOVA SECÇÃO PARA O BOTÃO DO CAG --- */}
+        <Divider />
+        <Box>
+          <Heading size="sm" mb={3} color="gray.600">
+            Ferramentas de IA
+          </Heading>
+          <Button
+            leftIcon={<FaRobot />}
+            colorScheme="purple"
+            variant="solid"
+            width="100%"
+            onClick={() => navigate('/cag')}
+            boxShadow="md"
+            _hover={{ transform: 'translateY(-2px)', boxShadow: 'lg' }}
+            transition="all 0.2s"
+          >
+            Abrir Assistente CAG (PDFs)
+          </Button>
+          <Text fontSize="xs" color="gray.500" mt={2} textAlign="center">
+            Analise documentos médicos num ambiente isolado.
+          </Text>
+        </Box>
+        {/* ------------------------------------------ */}
+
       </VStack>
 
       {/* Settings Modal */}

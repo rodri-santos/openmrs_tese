@@ -1,6 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
+const multer = require('multer'); // --- ADICIONADO PARA O CAG ---
+const cagController = require('./api/cag.cjs'); // --- ADICIONADO PARA O CAG --- (ajusta o path se o cag.js estiver noutra pasta)
+
 const app = express();
 const port = 3001;
 
@@ -12,31 +15,48 @@ app.get('/', (req, res) => {
   res.json({ message: 'OpenMRS AI Proxy Server is running. Use /api route for proxy requests.' });
 });
 
+
+// =========================================================================
+// --- ADICIONADO PARA O CAG ---
+// Estas rotas têm de estar AQUI, antes do app.use('/api', ...), 
+// caso contrário o proxy tenta reencaminhá-las para o OpenMRS e falha.
+// =========================================================================
+
+// Configurar o multer para usar APENAS a memória RAM (não guarda no disco)
+const upload = multer({ storage: multer.memoryStorage() });
+
+app.post('/api/cag/upload', upload.single('file'), cagController.uploadPDF);
+app.post('/api/cag/query', cagController.handleCAGQuery);
+app.post('/api/cag/end-session', cagController.endSession);
+
+// =========================================================================
+
+
 // Proxy middleware
 app.use('/api', async (req, res) => {
   // Get the target URL from the request
-  const baseUrl = req.query.baseUrl || 'https://o2.openmrs.org/openmrs';
+  const baseUrl = req.query.baseUrl || 'http://localhost/openmrs';
   const path = req.query.path || '';
   const url = `${baseUrl}${path}`;
-  
+
   // Get auth credentials
   const authHeader = req.headers.authorization;
-  
+
   // Check if streaming is requested
   const shouldStream = req.query.stream === 'true';
-  
+
   console.log('Proxy request:', {
     method: req.method,
     url,
     shouldStream,
     bodySize: req.body ? JSON.stringify(req.body).length : 0
   });
-  
+
   try {
     if (shouldStream) {
       // Streaming mode
       console.log('Using streaming mode for:', url);
-      
+
       const axiosResponse = await axios({
         method: req.method,
         url: url,
@@ -52,9 +72,9 @@ app.use('/api', async (req, res) => {
         responseType: 'stream', // Enable streaming
         validateStatus: () => true, // Accept any status code
       });
-      
+
       console.log('Stream response status:', axiosResponse.status);
-      
+
       // Set status and headers
       res.status(axiosResponse.status);
       Object.entries(axiosResponse.headers).forEach(([key, value]) => {
@@ -63,10 +83,10 @@ app.use('/api', async (req, res) => {
           res.set(key, value);
         }
       });
-      
+
       // Pipe the response stream to the client
       axiosResponse.data.pipe(res);
-      
+
       // Handle errors in the stream
       axiosResponse.data.on('error', (error) => {
         console.error('Stream error:', error.message);
@@ -79,7 +99,7 @@ app.use('/api', async (req, res) => {
     } else {
       // Non-streaming mode (original behavior)
       console.log('Using non-streaming mode for:', url);
-      
+
       const response = await axios({
         method: req.method,
         url: url,
@@ -96,7 +116,7 @@ app.use('/api', async (req, res) => {
       });
 
       console.log('Response status:', response.status);
-      
+
       // Forward the response back to the client
       res.status(response.status);
       res.set(response.headers);
@@ -104,10 +124,10 @@ app.use('/api', async (req, res) => {
     }
   } catch (error) {
     console.error('Proxy error:', error.message);
-    res.status(500).json({ 
-      error: 'Proxy Error', 
+    res.status(500).json({
+      error: 'Proxy Error',
       message: error.message,
-      details: error.response?.data || {} 
+      details: error.response?.data || {}
     });
   }
 });
