@@ -1,6 +1,17 @@
 // src/services/cagService.js
-const API_BASE = "http://localhost:3001"; // Apontar para o teu Node.js!
+const API_BASE = "http://localhost:3001";
 
+export async function warmupCAG() {
+
+    const res = await fetch(
+        `${API_BASE}/api/cag/warmup`,
+        {
+            method: "POST"
+        }
+    );
+
+    return res.json();
+}
 export async function askCAG(question) {
     const res = await fetch(`${API_BASE}/api/cag/query`, {
         method: "POST",
@@ -20,7 +31,7 @@ export async function uploadFileCAG(file) {
     });
 
     if (!res.ok) {
-        throw new Error("Erro no servidor"); // Força o erro para o catch se a resposta não for OK (ex: 404 ou 500)
+        throw new Error("Erro no servidor");
     }
 
     return res.json();

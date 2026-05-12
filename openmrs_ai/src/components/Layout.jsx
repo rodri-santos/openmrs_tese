@@ -1,10 +1,51 @@
 import { Grid, GridItem } from '@chakra-ui/react'
+import { useEffect } from 'react'
+
 import Sidebar from './Sidebar'
 import MainContent from './MainContent'
+
 import { useOpenMRS } from '../contexts/OpenMRSContext'
 
 const Layout = () => {
-  const { selectedPatient, isLoadingPatientData } = useOpenMRS()
+
+  const {
+    selectedPatient,
+    isLoadingPatientData
+  } = useOpenMRS()
+
+  // =====================================
+  // Warmup do modelo
+  // =====================================
+
+  useEffect(() => {
+
+    async function warmupModel() {
+
+      try {
+
+        console.log("A aquecer modelo...");
+
+        await fetch(
+          'http://localhost:3001/api/cag/warmup',
+          {
+            method: 'POST'
+          }
+        );
+
+        console.log("Modelo pronto.");
+
+      } catch (error) {
+
+        console.error(
+          "Erro no warmup:",
+          error
+        );
+      }
+    }
+
+    warmupModel();
+
+  }, []);
 
   return (
     <Grid
@@ -13,6 +54,7 @@ const Layout = () => {
       h="100vh"
       overflow="hidden"
     >
+
       <GridItem
         borderRight="1px"
         borderColor="gray.200"
@@ -22,10 +64,14 @@ const Layout = () => {
       >
         <Sidebar />
       </GridItem>
-      
-      <GridItem overflowY="auto" h="100vh">
+
+      <GridItem
+        overflowY="auto"
+        h="100vh"
+      >
         <MainContent />
       </GridItem>
+
     </Grid>
   )
 }

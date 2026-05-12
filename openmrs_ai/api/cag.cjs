@@ -1,97 +1,313 @@
+// api/cag.cjs
+
 const pdfParser = require("pdf-parse");
 
-console.log("*****************************************");
-console.log("🚀 SISTEMA CAG V2 (VERSÃO CLASSE) CARREGADO!");
-console.log("Caminho: " + __filename);
-console.log("*****************************************");
+// =========================
+// Sessão temporária (RAM)
+// =========================
 
-let sessionContext = "";
+let sessionDocuments = [];
 let cache = [];
 
+// =========================
+// Config
+// =========================
+
+const MAX_CONTEXT_DOCUMENTS = 3;
+
+// =========================
+// Utils
+// =========================
+
+function normalizeText(text) {
+    return text
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, " ");
+}
+
+function buildContext() {
+    return sessionDocuments
+        .slice(-MAX_CONTEXT_DOCUMENTS)
+        .join("\n\n");
+}
+
+// =========================
+// LLM
+// =========================
+
+async function warmupModel(req, res) {
+
+    try {
+
+        console.log("A aquecer modelo...");
+
+        await fetch("http://localhost:11434/api/generate", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                model: "gemma3:12b-it-qat",
+                prompt: "Hello",
+                stream: false,
+                keep_alive: "20m"
+            })
+        });
+
+        console.log("Modelo pronto.");
+
+        res.json({
+            success: true
+        });
+
+    } catch (error) {
+
+        console.error("ERRO WARMUP:", error);
+
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+}
+
 async function callLLM(prompt) {
+
     const response = await fetch("http://localhost:11434/api/generate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
         body: JSON.stringify({
-            model: "gemma3:27b-it-qat",
-            prompt: prompt,
-            stream: false
+            model: "gemma3:12b-it-qat",
+            prompt,
+            stream: false,
+            keep_alive: "20m",
+            options: {
+                num_predict: 512,
+                temperature: 0.2
+            }
         })
     });
+
+    if (!response.ok) {
+        throw new Error("Erro ao contactar o Ollama.");
+    }
+
     const data = await response.json();
+
     return data.response;
 }
 
+// =========================
+// Query CAG
+// =========================
+
 async function handleCAGQuery(req, res) {
-    const { question } = req.body;
-    const hit = cache.find(c => c.question.toLowerCase().trim() === question.toLowerCase().trim());
-    if (hit) return res.json({ answer: hit.answer, cached: true });
-
-    const prompt = `Contexto: ${sessionContext || "Vazio"}\n\nPergunta: ${question}\n\nResponde apenas com base no contexto.`;
-
     try {
-        const answer = await callLLM(prompt);
-        cache.push({ question, answer });
-        res.json({ answer, cached: false });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-}
+        const { question } = req.body;
 
-async function uploadPDF(req, res) {
-    if (!req.file) return res.status(400).json({ success: false, error: "Ficheiro não recebido." });
-
-    try {
-        console.log("📥 A processar novo PDF...");
-
-        // --- TENTATIVA DE IMPORTAÇÃO DIRETA ---
-        // Se o require normal falhou, tentamos ir buscar a função diretamente ao motor
-        let pdf;
-        try {
-            pdf = require('pdf-parse/lib/pdf-parse.js');
-        } catch (e) {
-            pdf = require('pdf-parse');
-        }
-
-        // Garantir que temos a função de extração
-        const parse = (typeof pdf === 'function') ? pdf : (pdf.default || pdf.PDFParse);
-
-        if (!parse) throw new Error("Não foi possível encontrar a função de extração.");
-
-        // Executar a extração (pdf-parse é SEMPRE uma função que recebe o buffer)
-        const data = await parse(req.file.buffer);
-
-        // Verificação de segurança
-        const text = data.text || "";
-
-        if (text.trim().length === 0) {
-            console.log("⚠️ A extração falhou (0 caracteres). O PDF pode ser uma imagem/scan.");
-            return res.status(422).json({
+        if (!question || question.trim().length === 0) {
+            return res.status(400).json({
                 success: false,
-                error: "O PDF parece estar vazio ou é uma imagem (não selecionável)."
+                error: "Pergunta inválida."
             });
         }
 
-        sessionContext += "\n" + text;
-        console.log("✅ PDF lido com sucesso!");
-        console.log("📊 Caracteres extraídos:", text.length);
-        console.log("📝 Início do texto:", text.substring(0, 100).replace(/\n/g, ' '));
+        // =========================
+        // Cache hit
+        // =========================
 
-        res.json({ success: true, message: "PDF carregado!" });
+        const normalizedQuestion = normalizeText(question);
+
+        const hit = cache.find(
+            c => normalizeText(c.question) === normalizedQuestion
+        );
+
+        if (hit) {
+            console.log("CACHE HIT");
+
+            return res.json({
+                success: true,
+                cached: true,
+                answer: hit.answer
+            });
+        }
+
+        // =========================
+        // Contexto
+        // =========================
+
+        const context = buildContext();
+
+        const prompt = `
+És um assistente clínico.
+
+Responde APENAS com base no contexto fornecido.
+
+Se a informação não estiver presente no contexto, diz:
+"Não encontrei essa informação nos documentos fornecidos."
+
+================ CONTEXTO ================
+
+${context || "Sem documentos carregados."}
+
+================ PERGUNTA ================
+
+${question}
+
+================ RESPOSTA ================
+`;
+
+        // =========================
+        // Chamada ao LLM
+        // =========================
+
+        const answer = await callLLM(prompt);
+
+        // =========================
+        // Guardar cache
+        // =========================
+
+        cache.push({
+            question,
+            answer,
+            timestamp: Date.now()
+        });
+
+        console.log("Nova resposta guardada em cache.");
+
+        res.json({
+            success: true,
+            cached: false,
+            answer
+        });
+
     } catch (error) {
-        console.error("❌ ERRO NO UPLOAD:", error.message);
-        res.status(500).json({ success: false, error: "Erro: " + error.message });
+        console.error("ERRO QUERY:", error);
+
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
     }
 }
 
-async function endSession(req, res) {
-    sessionContext = "";
-    cache = [];
-    res.json({ success: true });
+// =========================
+// Upload PDF
+// =========================
+
+async function uploadPDF(req, res) {
+    try {
+
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                error: "Ficheiro não recebido."
+            });
+        }
+
+        console.log("A processar novo PDF...");
+
+        // =========================
+        // Parse PDF
+        // =========================
+
+        const data = await pdfParser(req.file.buffer);
+
+        const text = data.text || "";
+
+        // =========================
+        // Verificações
+        // =========================
+
+        if (text.trim().length === 0) {
+            return res.status(422).json({
+                success: false,
+                error: "O PDF parece estar vazio ou é uma imagem/scanned PDF."
+            });
+        }
+
+        // =========================
+        // Guardar em RAM
+        // =========================
+
+        sessionDocuments.push(text);
+
+        console.log("PDF lido com sucesso.");
+        console.log("Caracteres extraídos:", text.length);
+        console.log("Número de documentos:", sessionDocuments.length);
+
+        res.json({
+            success: true,
+            message: "PDF carregado com sucesso.",
+            characters: text.length,
+            documentsLoaded: sessionDocuments.length
+        });
+
+    } catch (error) {
+
+        console.error("ERRO NO UPLOAD:", error);
+
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
 }
+
+// =========================
+// Reset sessão
+// =========================
+
+async function endSession(req, res) {
+    try {
+
+        sessionDocuments = [];
+        cache = [];
+
+        console.log("Sessão CAG limpa.");
+
+        res.json({
+            success: true,
+            message: "Sessão terminada."
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+}
+
+// =========================
+// Debug endpoint (opcional)
+// =========================
+
+async function getSessionInfo(req, res) {
+    res.json({
+        success: true,
+        documentsLoaded: sessionDocuments.length,
+        cacheEntries: cache.length
+    });
+}
+
+// =========================
+// Exports
+// =========================
 
 module.exports = {
     handleCAGQuery,
     uploadPDF,
-    endSession
+    endSession,
+    getSessionInfo,
+    warmupModel
 };

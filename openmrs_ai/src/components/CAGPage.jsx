@@ -95,7 +95,7 @@ export default function CAGPage() {
                     >
                         Terminar Sessão e Limpar Dados
                     </button>
-                    <p style={{ marginTop: "10px", fontSize: "14px" }}>Cache Hits nesta sessão: {cacheHits || 0}</p>
+                    <p style={{ marginTop: "10px", fontSize: "14px" }}>Cache Hits: {cacheHits || 0}</p>
                 </div>
             </div>
 

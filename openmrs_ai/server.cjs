@@ -1,129 +1,226 @@
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
-const multer = require('multer'); // --- ADICIONADO PARA O CAG ---
-const cagController = require('./api/cag.cjs'); // --- ADICIONADO PARA O CAG --- (ajusta o path se o cag.js estiver noutra pasta)
+const multer = require('multer');
+
+const cagController = require('./api/cag.cjs');
 
 const app = express();
 const port = 3001;
 
-app.use(cors()); // Enable CORS for all routes
-app.use(express.json()); // Parse JSON request bodies
+// =====================================================
+// Middleware
+// =====================================================
 
+app.use(cors());
+app.use(express.json());
+
+// =====================================================
 // Root route
+// =====================================================
+
 app.get('/', (req, res) => {
-  res.json({ message: 'OpenMRS AI Proxy Server is running. Use /api route for proxy requests.' });
+  res.json({
+    message: 'OpenMRS AI Proxy Server is running.'
+  });
 });
 
+// =====================================================
+// CAG ROUTES
+// IMPORTANTE:
+// Estas rotas têm de ficar ANTES do proxy '/api'
+// =====================================================
 
-// =========================================================================
-// --- ADICIONADO PARA O CAG ---
-// Estas rotas têm de estar AQUI, antes do app.use('/api', ...), 
-// caso contrário o proxy tenta reencaminhá-las para o OpenMRS e falha.
-// =========================================================================
+// PDFs apenas em RAM
+const upload = multer({
+  storage: multer.memoryStorage(),
 
-// Configurar o multer para usar APENAS a memória RAM (não guarda no disco)
-const upload = multer({ storage: multer.memoryStorage() });
+  // opcional mas recomendado
+  limits: {
+    fileSize: 20 * 1024 * 1024 // 20MB
+  }
+});
 
-app.post('/api/cag/upload', upload.single('file'), cagController.uploadPDF);
-app.post('/api/cag/query', cagController.handleCAGQuery);
-app.post('/api/cag/end-session', cagController.endSession);
+// Upload PDF
+app.post(
+  '/api/cag/upload',
+  upload.single('file'),
+  cagController.uploadPDF
+);
 
-// =========================================================================
+// Perguntas CAG
+app.post(
+  '/api/cag/query',
+  cagController.handleCAGQuery
+);
 
+// Limpar sessão
+app.post(
+  '/api/cag/end-session',
+  cagController.endSession
+);
 
-// Proxy middleware
+// Debug/info sessão
+app.get(
+  '/api/cag/session-info',
+  cagController.getSessionInfo
+);
+
+// Warmup modelo
+app.post(
+  '/api/cag/warmup',
+  cagController.warmupModel
+);
+
+// =====================================================
+// OPENMRS PROXY
+// =====================================================
+
 app.use('/api', async (req, res) => {
-  // Get the target URL from the request
+
   const baseUrl = req.query.baseUrl || 'http://localhost/openmrs';
+
   const path = req.query.path || '';
+
   const url = `${baseUrl}${path}`;
 
-  // Get auth credentials
   const authHeader = req.headers.authorization;
 
-  // Check if streaming is requested
   const shouldStream = req.query.stream === 'true';
 
   console.log('Proxy request:', {
     method: req.method,
     url,
     shouldStream,
-    bodySize: req.body ? JSON.stringify(req.body).length : 0
+    bodySize: req.body
+      ? JSON.stringify(req.body).length
+      : 0
   });
 
   try {
+
+    // =====================================================
+    // STREAMING MODE
+    // =====================================================
+
     if (shouldStream) {
-      // Streaming mode
+
       console.log('Using streaming mode for:', url);
 
       const axiosResponse = await axios({
         method: req.method,
-        url: url,
-        data: req.method !== 'GET' ? req.body : undefined,
+        url,
+        data: req.method !== 'GET'
+          ? req.body
+          : undefined,
+
         headers: {
           ...req.headers,
           host: new URL(baseUrl).host,
         },
-        auth: authHeader ? {
-          username: Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':')[0],
-          password: Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':')[1]
-        } : undefined,
-        responseType: 'stream', // Enable streaming
-        validateStatus: () => true, // Accept any status code
+
+        auth: authHeader
+          ? {
+            username: Buffer
+              .from(authHeader.split(' ')[1], 'base64')
+              .toString()
+              .split(':')[0],
+
+            password: Buffer
+              .from(authHeader.split(' ')[1], 'base64')
+              .toString()
+              .split(':')[1]
+          }
+          : undefined,
+
+        responseType: 'stream',
+
+        validateStatus: () => true,
       });
 
       console.log('Stream response status:', axiosResponse.status);
 
-      // Set status and headers
       res.status(axiosResponse.status);
+
       Object.entries(axiosResponse.headers).forEach(([key, value]) => {
-        // Don't copy content-length as it may be incorrect for streaming
+
         if (key.toLowerCase() !== 'content-length') {
           res.set(key, value);
         }
+
       });
 
-      // Pipe the response stream to the client
       axiosResponse.data.pipe(res);
 
-      // Handle errors in the stream
       axiosResponse.data.on('error', (error) => {
+
         console.error('Stream error:', error.message);
+
         if (!res.headersSent) {
-          res.status(500).json({ error: 'Stream Error', message: error.message });
+
+          res.status(500).json({
+            error: 'Stream Error',
+            message: error.message
+          });
+
         } else {
           res.end();
         }
       });
-    } else {
-      // Non-streaming mode (original behavior)
+
+    }
+
+    // =====================================================
+    // NORMAL MODE
+    // =====================================================
+
+    else {
+
       console.log('Using non-streaming mode for:', url);
 
       const response = await axios({
         method: req.method,
-        url: url,
-        data: req.method !== 'GET' ? req.body : undefined,
+        url,
+
+        data: req.method !== 'GET'
+          ? req.body
+          : undefined,
+
         headers: {
           ...req.headers,
           host: new URL(baseUrl).host,
         },
-        auth: authHeader ? {
-          username: Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':')[0],
-          password: Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':')[1]
-        } : undefined,
-        validateStatus: () => true, // Accept any status code
+
+        auth: authHeader
+          ? {
+            username: Buffer
+              .from(authHeader.split(' ')[1], 'base64')
+              .toString()
+              .split(':')[0],
+
+            password: Buffer
+              .from(authHeader.split(' ')[1], 'base64')
+              .toString()
+              .split(':')[1]
+          }
+          : undefined,
+
+        validateStatus: () => true,
       });
 
       console.log('Response status:', response.status);
 
-      // Forward the response back to the client
       res.status(response.status);
+
       res.set(response.headers);
+
       res.send(response.data);
     }
+
   } catch (error) {
+
     console.error('Proxy error:', error.message);
+
     res.status(500).json({
       error: 'Proxy Error',
       message: error.message,
@@ -132,7 +229,10 @@ app.use('/api', async (req, res) => {
   }
 });
 
-// Start the server
+// =====================================================
+// START SERVER
+// =====================================================
+
 app.listen(port, () => {
   console.log(`Local proxy server running at http://localhost:${port}`);
 });

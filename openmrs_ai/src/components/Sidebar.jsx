@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom' // <-- 1. IMPORTAMOS O useNavigate AQUI
+import { useNavigate } from 'react-router-dom'
 import {
   Box,
   VStack,
@@ -26,7 +26,7 @@ import {
   IconButton,
   useDisclosure,
 } from '@chakra-ui/react'
-import { FaEye, FaEyeSlash, FaSearch, FaCog, FaRobot } from 'react-icons/fa' // Adicionei também o FaRobot para o botão do CAG
+import { FaEye, FaEyeSlash, FaSearch, FaCog, FaRobot } from 'react-icons/fa'
 import { useOpenMRS } from '../contexts/OpenMRSContext'
 import createOpenMrsApi from '../services/openMrsService'
 import { useQuery } from 'react-query'
@@ -35,7 +35,7 @@ import SettingsModal from './SettingsModal'
 
 const Sidebar = () => {
   const toast = useToast()
-  const navigate = useNavigate() // <-- 2. INICIALIZAMOS O HOOK AQUI
+  const navigate = useNavigate()
 
   const {
     credentials,
@@ -327,7 +327,7 @@ const Sidebar = () => {
         <Divider />
         <Box>
           <Heading size="sm" mb={3} color="gray.600">
-            Ferramentas de IA
+            AI Tools
           </Heading>
           <Button
             leftIcon={<FaRobot />}
@@ -339,10 +339,10 @@ const Sidebar = () => {
             _hover={{ transform: 'translateY(-2px)', boxShadow: 'lg' }}
             transition="all 0.2s"
           >
-            Abrir Assistente CAG (PDFs)
+            CAG (PDFs)
           </Button>
           <Text fontSize="xs" color="gray.500" mt={2} textAlign="center">
-            Analise documentos médicos num ambiente isolado.
+            Analisar documentos num ambiente isolado.
           </Text>
         </Box>
         {/* ------------------------------------------ */}
