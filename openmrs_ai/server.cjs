@@ -4,20 +4,17 @@ const axios = require('axios');
 const multer = require('multer');
 
 const cagController = require('./api/cag.cjs');
+const qaCagController = require("./api/qaCag.cjs");
 
 const app = express();
 const port = 3001;
 
-// =====================================================
-// Middleware
-// =====================================================
+const upload = multer({
+  storage: multer.memoryStorage()
+});
 
 app.use(cors());
 app.use(express.json());
-
-// =====================================================
-// Root route
-// =====================================================
 
 app.get('/', (req, res) => {
   res.json({
@@ -25,51 +22,60 @@ app.get('/', (req, res) => {
   });
 });
 
-// =====================================================
-// CAG ROUTES
-// IMPORTANTE:
-// Estas rotas têm de ficar ANTES do proxy '/api'
-// =====================================================
-
-// PDFs apenas em RAM
-const upload = multer({
-  storage: multer.memoryStorage(),
-
-  // opcional mas recomendado
-  limits: {
-    fileSize: 20 * 1024 * 1024 // 20MB
-  }
+app.use((req, res, next) => {
+  console.log("REQUEST:", req.method, req.url);
+  next();
 });
 
-// Upload PDF
+// =====================================================
+// QA ROUTES
+// =====================================================
+
 app.post(
-  '/api/cag/upload',
-  upload.single('file'),
-  cagController.uploadPDF
+  "/api/qa/upload",
+  upload.single("file"),
+  qaCagController.uploadPDF
 );
 
-// Perguntas CAG
 app.post(
-  '/api/cag/query',
-  cagController.handleCAGQuery
+  "/api/qa/ask",
+  qaCagController.askQuestion
 );
 
-// Limpar sessão
 app.post(
-  '/api/cag/end-session',
+  "/api/qa/end-session",
+  qaCagController.endSession
+);
+
+// =====================================================
+// CAG ROUTES
+// =====================================================
+
+app.post(
+  "/api/cag/upload-rse",
+  upload.single("file"),
+  cagController.uploadRSE
+);
+
+app.post(
+  "/api/cag/upload-modulab",
+  upload.single("file"),
+  cagController.uploadModulab
+);
+
+app.post(
+  "/api/cag/rewrite",
+  cagController.rewriteRSE
+);
+
+app.post(
+  "/api/cag/end-session",
   cagController.endSession
 );
 
-// Debug/info sessão
 app.get(
-  '/api/cag/session-info',
+  "/api/cag/session-info",
   cagController.getSessionInfo
-);
-
-// Warmup modelo
-app.post(
-  '/api/cag/warmup',
-  cagController.warmupModel
 );
 
 // =====================================================
@@ -78,15 +84,21 @@ app.post(
 
 app.use('/api', async (req, res) => {
 
-  const baseUrl = req.query.baseUrl || 'http://localhost/openmrs';
+  const baseUrl =
+    req.query.baseUrl ||
+    'http://localhost/openmrs';
 
-  const path = req.query.path || '';
+  const path =
+    req.query.path || '';
 
-  const url = `${baseUrl}${path}`;
+  const url =
+    `${baseUrl}${path}`;
 
-  const authHeader = req.headers.authorization;
+  const authHeader =
+    req.headers.authorization;
 
-  const shouldStream = req.query.stream === 'true';
+  const shouldStream =
+    req.query.stream === 'true';
 
   console.log('Proxy request:', {
     method: req.method,
@@ -99,116 +111,107 @@ app.use('/api', async (req, res) => {
 
   try {
 
-    // =====================================================
-    // STREAMING MODE
-    // =====================================================
-
     if (shouldStream) {
 
-      console.log('Using streaming mode for:', url);
+      const axiosResponse =
+        await axios({
 
-      const axiosResponse = await axios({
-        method: req.method,
-        url,
-        data: req.method !== 'GET'
-          ? req.body
-          : undefined,
+          method: req.method,
 
-        headers: {
-          ...req.headers,
-          host: new URL(baseUrl).host,
-        },
+          url,
 
-        auth: authHeader
-          ? {
-            username: Buffer
-              .from(authHeader.split(' ')[1], 'base64')
-              .toString()
-              .split(':')[0],
+          data:
+            req.method !== 'GET'
+              ? req.body
+              : undefined,
 
-            password: Buffer
-              .from(authHeader.split(' ')[1], 'base64')
-              .toString()
-              .split(':')[1]
-          }
-          : undefined,
+          headers: {
+            ...req.headers,
+            host: new URL(baseUrl).host,
+          },
 
-        responseType: 'stream',
+          auth: authHeader
+            ? {
+              username: Buffer
+                .from(
+                  authHeader.split(' ')[1],
+                  'base64'
+                )
+                .toString()
+                .split(':')[0],
 
-        validateStatus: () => true,
-      });
+              password: Buffer
+                .from(
+                  authHeader.split(' ')[1],
+                  'base64'
+                )
+                .toString()
+                .split(':')[1]
+            }
+            : undefined,
 
-      console.log('Stream response status:', axiosResponse.status);
+          responseType: 'stream',
+
+          validateStatus: () => true,
+        });
 
       res.status(axiosResponse.status);
 
-      Object.entries(axiosResponse.headers).forEach(([key, value]) => {
+      Object.entries(
+        axiosResponse.headers
+      ).forEach(([key, value]) => {
 
-        if (key.toLowerCase() !== 'content-length') {
+        if (
+          key.toLowerCase() !==
+          'content-length'
+        ) {
           res.set(key, value);
         }
-
       });
 
       axiosResponse.data.pipe(res);
 
-      axiosResponse.data.on('error', (error) => {
+    } else {
 
-        console.error('Stream error:', error.message);
+      const response =
+        await axios({
 
-        if (!res.headersSent) {
+          method: req.method,
 
-          res.status(500).json({
-            error: 'Stream Error',
-            message: error.message
-          });
+          url,
 
-        } else {
-          res.end();
-        }
-      });
+          data:
+            req.method !== 'GET'
+              ? req.body
+              : undefined,
 
-    }
+          headers: {
+            ...req.headers,
+            host: new URL(baseUrl).host,
+          },
 
-    // =====================================================
-    // NORMAL MODE
-    // =====================================================
+          auth: authHeader
+            ? {
+              username: Buffer
+                .from(
+                  authHeader.split(' ')[1],
+                  'base64'
+                )
+                .toString()
+                .split(':')[0],
 
-    else {
+              password: Buffer
+                .from(
+                  authHeader.split(' ')[1],
+                  'base64'
+                )
+                .toString()
+                .split(':')[1]
+            }
+            : undefined,
 
-      console.log('Using non-streaming mode for:', url);
-
-      const response = await axios({
-        method: req.method,
-        url,
-
-        data: req.method !== 'GET'
-          ? req.body
-          : undefined,
-
-        headers: {
-          ...req.headers,
-          host: new URL(baseUrl).host,
-        },
-
-        auth: authHeader
-          ? {
-            username: Buffer
-              .from(authHeader.split(' ')[1], 'base64')
-              .toString()
-              .split(':')[0],
-
-            password: Buffer
-              .from(authHeader.split(' ')[1], 'base64')
-              .toString()
-              .split(':')[1]
-          }
-          : undefined,
-
-        validateStatus: () => true,
-      });
-
-      console.log('Response status:', response.status);
+          validateStatus: () => true,
+        });
 
       res.status(response.status);
 
@@ -219,20 +222,21 @@ app.use('/api', async (req, res) => {
 
   } catch (error) {
 
-    console.error('Proxy error:', error.message);
+    console.error(
+      'Proxy error:',
+      error.message
+    );
 
     res.status(500).json({
       error: 'Proxy Error',
-      message: error.message,
-      details: error.response?.data || {}
+      message: error.message
     });
   }
 });
 
-// =====================================================
-// START SERVER
-// =====================================================
-
 app.listen(port, () => {
-  console.log(`Local proxy server running at http://localhost:${port}`);
+
+  console.log(
+    `Local proxy server running at http://localhost:${port}`
+  );
 });

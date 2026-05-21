@@ -7,6 +7,7 @@ import { CAGProvider } from './contexts/CAGContext'
 
 import Layout from './components/Layout'
 import CAGPage from './components/CAGPage'
+import QACAGPage from "./components/QACAGPage";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
               <Route path="/*" element={<Layout />} />
               {/* Rota totalmente isolada para o CAG (ecrã inteiro) */}
               <Route path="/cag" element={<CAGPage />} />
+              <Route path="/qa" element={<QACAGPage />} />
 
             </Routes>
           </Box>

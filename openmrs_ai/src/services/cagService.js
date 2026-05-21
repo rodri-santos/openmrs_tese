@@ -1,45 +1,37 @@
-// src/services/cagService.js
-const API_BASE = "http://localhost:3001";
+export async function uploadRSE(file) {
 
-export async function warmupCAG() {
-
-    const res = await fetch(
-        `${API_BASE}/api/cag/warmup`,
-        {
-            method: "POST"
-        }
-    );
-
-    return res.json();
-}
-export async function askCAG(question) {
-    const res = await fetch(`${API_BASE}/api/cag/query`, {
-        method: "POST",
-        body: JSON.stringify({ question }),
-        headers: { "Content-Type": "application/json" }
-    });
-    return res.json();
-}
-
-export async function uploadFileCAG(file) {
     const formData = new FormData();
     formData.append("file", file);
 
-    const res = await fetch(`${API_BASE}/api/cag/upload`, {
+    const res = await fetch("http://localhost:3001/api/cag/upload-rse", {
         method: "POST",
         body: formData
     });
 
-    if (!res.ok) {
-        throw new Error("Erro no servidor");
-    }
+    return res.json();
+}
+
+export async function uploadModulab(file) {
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch("http://localhost:3001/api/cag/upload-modulab", {
+        method: "POST",
+        body: formData
+    });
 
     return res.json();
 }
 
+export async function rewriteRSE() {
+    return fetch("http://localhost:3001/api/cag/rewrite", {
+        method: "POST"
+    }).then(r => r.json());
+}
+
 export async function endCAGSession() {
-    const res = await fetch(`${API_BASE}/api/cag/end-session`, {
+    return fetch("http://localhost:3001/api/cag/end-session", {
         method: "POST"
     });
-    return res.json();
 }

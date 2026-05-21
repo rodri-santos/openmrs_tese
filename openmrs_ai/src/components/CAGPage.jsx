@@ -1,427 +1,130 @@
-import { useState, useContext, useEffect } from "react";
-import { CAGContext } from "../contexts/CAGContext";
-import { askCAG, uploadFileCAG, endCAGSession } from "../services/cagService";
-import { useNavigate } from "react-router-dom";
-
+import { useState } from "react";
 import ReactMarkdown from "react-markdown";
+import { uploadRSE, uploadModulab, rewriteRSE } from "../services/cagService";
 
 export default function CAGPage() {
 
-    const navigate = useNavigate();
+    const [result, setResult] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [status, setStatus] = useState("");
 
-    const {
-        cacheHits,
-        setCacheHits
-    } = useContext(CAGContext);
+    const handleRewrite = async () => {
 
-    const [messages, setMessages] = useState([]);
+        setLoading(true);
+        setStatus("A gerar registo atualizado...");
 
-    const [input, setInput] = useState("");
+        const res = await rewriteRSE();
 
-    const [isUploading, setIsUploading] = useState(false);
-
-    const [isLoading, setIsLoading] = useState(false);
-
-    useEffect(() => {
-
-        return () => {
-            endCAGSession();
-        };
-
-    }, []);
-
-    // =====================================================
-    // Upload PDF
-    // =====================================================
-
-    const handleFileUpload = async (e) => {
-
-        const file = e.target.files?.[0];
-
-        if (!file) return;
-
-        setIsUploading(true);
-
-        try {
-
-            const result =
-                await uploadFileCAG(file);
-
-            if (result.success) {
-
-                setMessages(prev => [
-
-                    ...prev,
-
-                    {
-                        role: "system",
-                        text: `📄 PDF carregado: ${file.name}`
-                    }
-                ]);
-            }
-
-        } catch (error) {
-
-            setMessages(prev => [
-
-                ...prev,
-
-                {
-                    role: "system",
-                    text: "Erro ao processar ficheiro."
-                }
-            ]);
-        }
-
-        setIsUploading(false);
+        setResult(res.result);
+        setLoading(false);
+        setStatus("Concluído");
     };
 
-    // =====================================================
-    // Enviar mensagem
-    // =====================================================
-
-    const handleSendMessage = async () => {
-
-        if (!input.trim()) return;
-
-        const userMsg = input;
-
-        setMessages(prev => [
-
-            ...prev,
-
-            {
-                role: "user",
-                text: userMsg
-            }
-        ]);
-
-        setInput("");
-
-        setIsLoading(true);
-
-        try {
-
-            const result =
-                await askCAG(userMsg);
-
-            if (
-                result.cached &&
-                setCacheHits
-            ) {
-
-                setCacheHits(prev => prev + 1);
-            }
-
-            setMessages(prev => [
-
-                ...prev,
-
-                {
-                    role: "ai",
-
-                    text:
-                        result.answer +
-                        (
-                            result.cached
-                                ? "\n\n⚡ Resposta em cache"
-                                : ""
-                        )
-                }
-            ]);
-
-        } catch (error) {
-
-            setMessages(prev => [
-
-                ...prev,
-
-                {
-                    role: "system",
-                    text:
-                        "Erro ao contactar o assistente."
-                }
-            ]);
-        }
-
-        setIsLoading(false);
+    const boxStyle = {
+        background: "white",
+        borderRadius: "12px",
+        padding: "16px",
+        boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
+        marginBottom: "16px"
     };
 
-    // =====================================================
-    // Enter
-    // =====================================================
-
-    const handleKeyDown = (e) => {
-
-        if (e.key === "Enter") {
-
-            handleSendMessage();
-        }
+    const buttonStyle = {
+        padding: "10px 16px",
+        borderRadius: "8px",
+        border: "none",
+        cursor: "pointer",
+        background: "#2563eb",
+        color: "white",
+        fontWeight: "bold"
     };
-
-    // =====================================================
-    // Limpar sessão
-    // =====================================================
-
-    const handleEndSession = async () => {
-
-        await endCAGSession();
-
-        setMessages([
-            {
-                role: "system",
-                text:
-                    "Sessão limpa e ficheiros esquecidos."
-            }
-        ]);
-    };
-
-    // =====================================================
-    // Render
-    // =====================================================
 
     return (
+        <div style={{
+            display: "grid",
+            gridTemplateColumns: "300px 1fr",
+            height: "100vh",
+            background: "#f5f7fb",
+            fontFamily: "Arial"
+        }}>
 
-        <div
-            style={{
-                display: "flex",
-                height: "100vh",
+            {/* LEFT PANEL */}
+            <div style={{
                 padding: "20px",
-                gap: "20px",
-                backgroundColor: "#f5f5f5"
-            }}
-        >
+                borderRight: "1px solid #e5e7eb",
+                background: "#ffffff"
+            }}>
 
-            {/* Sidebar */}
+                <h2 style={{ marginBottom: "20px" }}>
+                    CAG Clínico
+                </h2>
 
-            <div
-                style={{
-                    width: "25%",
-                    borderRight: "1px solid #ddd",
-                    paddingRight: "20px"
-                }}
-            >
+                {/* RSE */}
+                <div style={boxStyle}>
+                    <h4>Registo de Saúde</h4>
+                    <input
+                        type="file"
+                        onChange={e => uploadRSE(e.target.files[0])}
+                    />
+                </div>
 
-                <button
-                    onClick={() => navigate("/")}
+                {/* MODULAB */}
+                <div style={boxStyle}>
+                    <h4>Modulab</h4>
+                    <input
+                        type="file"
+                        onChange={e => uploadModulab(e.target.files[0])}
+                    />
+                </div>
 
-                    style={{
-                        padding: "10px",
-                        background: "#ccc",
-                        border: "none",
-                        borderRadius: "8px",
-                        cursor: "pointer",
-                        marginBottom: "20px",
-                        width: "100%"
-                    }}
-                >
-                    Voltar Assistente
-                </button>
-
-                <h3>Documentos</h3>
-
-                <p
-                    style={{
-                        fontSize: "12px",
-                        color: "gray"
-                    }}
-                >
-                    PDFs temporários em RAM.
-                </p>
-
-                <input
-                    type="file"
-                    accept="application/pdf"
-                    onChange={handleFileUpload}
-                    disabled={isUploading}
-                />
-
-                {
-                    isUploading &&
-                    <p>A extrair texto...</p>
-                }
-
-                <div style={{ marginTop: "40px" }}>
-
+                {/* ACTION */}
+                <div style={boxStyle}>
                     <button
-                        onClick={handleEndSession}
-
-                        style={{
-                            backgroundColor: "#ff4d4f",
-                            color: "white",
-                            padding: "10px",
-                            border: "none",
-                            borderRadius: "8px",
-                            cursor: "pointer",
-                            width: "100%"
-                        }}
+                        style={buttonStyle}
+                        onClick={handleRewrite}
+                        disabled={loading}
                     >
-                        Terminar Sessão
+                        {loading ? "A processar..." : "Gerar RSE atualizado"}
                     </button>
 
-                    <p
-                        style={{
-                            marginTop: "10px",
-                            fontSize: "14px"
-                        }}
-                    >
-                        Cache Hits: {cacheHits || 0}
+                    <p style={{
+                        marginTop: "10px",
+                        fontSize: "12px",
+                        color: "gray"
+                    }}>
+                        {status}
                     </p>
                 </div>
             </div>
 
-            {/* Chat */}
+            {/* RIGHT PANEL */}
+            <div style={{
+                padding: "20px",
+                overflowY: "auto"
+            }}>
 
-            <div
-                style={{
-                    flex: 1,
-                    display: "flex",
-                    flexDirection: "column"
-                }}
-            >
+                <div style={{
+                    background: "white",
+                    padding: "20px",
+                    borderRadius: "12px",
+                    boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
+                    minHeight: "100%"
+                }}>
 
-                <h2>
-                    Assistente Clínico CAG
-                </h2>
+                    <h3>Registo de Saúde Eletrónico Atualizado</h3>
 
-                {/* Messages */}
-
-                <div
-                    style={{
-                        flex: 1,
-                        overflowY: "auto",
-                        border: "1px solid #ddd",
-                        backgroundColor: "white",
-                        borderRadius: "12px",
-                        padding: "20px",
-                        marginBottom: "10px"
-                    }}
-                >
-
-                    {
-                        messages.map((m, i) => (
-
-                            <div
-                                key={i}
-
-                                style={{
-                                    display: "flex",
-
-                                    justifyContent:
-                                        m.role === "user"
-                                            ? "flex-end"
-                                            : "flex-start",
-
-                                    marginBottom: "15px"
-                                }}
-                            >
-
-                                <div
-                                    style={{
-
-                                        backgroundColor:
-
-                                            m.role === "user"
-                                                ? "#007bff"
-
-                                                : m.role === "system"
-                                                    ? "#ffe5e5"
-                                                    : "#f1f1f1",
-
-                                        color:
-                                            m.role === "user"
-                                                ? "white"
-                                                : "black",
-
-                                        padding: "12px 16px",
-
-                                        borderRadius: "16px",
-
-                                        maxWidth: "75%",
-
-                                        lineHeight: "1.6",
-
-                                        boxShadow:
-                                            "0 2px 6px rgba(0,0,0,0.08)"
-                                    }}
-                                >
-
-                                    <ReactMarkdown>
-                                        {m.text}
-                                    </ReactMarkdown>
-
-                                </div>
-                            </div>
-                        ))
-                    }
-
-                    {
-                        isLoading && (
-
-                            <div
-                                style={{
-                                    textAlign: "left"
-                                }}
-                            >
-                                <span
-                                    style={{
-                                        padding: "10px 14px",
-                                        backgroundColor: "#f1f1f1",
-                                        borderRadius: "15px"
-                                    }}
-                                >
-                                    A pensar...
-                                </span>
-                            </div>
-                        )
-                    }
-
-                </div>
-
-                {/* Input */}
-
-                <div
-                    style={{
-                        display: "flex",
-                        gap: "10px"
-                    }}
-                >
-
-                    <input
-                        style={{
-                            flex: 1,
-                            padding: "12px",
-                            borderRadius: "10px",
-                            border: "1px solid #ccc"
-                        }}
-
-                        value={input}
-
-                        onChange={e =>
-                            setInput(e.target.value)
-                        }
-
-                        onKeyDown={handleKeyDown}
-
-                        placeholder="Pergunta algo sobre os documentos..."
-                    />
-
-                    <button
-                        onClick={handleSendMessage}
-
-                        disabled={isLoading}
-
-                        style={{
-                            padding: "12px 20px",
-                            borderRadius: "10px",
-                            border: "none",
-                            backgroundColor: "#007bff",
-                            color: "white",
-                            cursor: "pointer"
-                        }}
-                    >
-                        Enviar
-                    </button>
+                    <div style={{
+                        marginTop: "20px",
+                        fontSize: "14px",
+                        lineHeight: "1.6"
+                    }}>
+                        {result ? (
+                            <ReactMarkdown>{result}</ReactMarkdown>
+                        ) : (
+                            <p style={{ color: "#888" }}>
+                                O resultado aparecerá aqui após gerar o RSE atualizado.
+                            </p>
+                        )}
+                    </div>
 
                 </div>
             </div>
