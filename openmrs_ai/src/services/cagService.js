@@ -1,9 +1,9 @@
-export async function uploadRSE(file) {
+export async function uploadDocument(file) {
 
     const formData = new FormData();
     formData.append("file", file);
 
-    const res = await fetch("http://localhost:3001/api/cag/upload-rse", {
+    const res = await fetch("http://localhost:3001/api/cag/upload", {
         method: "POST",
         body: formData
     });
@@ -11,27 +11,41 @@ export async function uploadRSE(file) {
     return res.json();
 }
 
-export async function uploadModulab(file) {
+// =====================================================
+// GERAÇÃO COM INSTRUÇÃO (NOVA LÓGICA)
+// =====================================================
 
-    const formData = new FormData();
-    formData.append("file", file);
+export async function generateDocument(instruction) {
 
-    const res = await fetch("http://localhost:3001/api/cag/upload-modulab", {
+    const res = await fetch("http://localhost:3001/api/cag/generate", {
         method: "POST",
-        body: formData
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            instruction
+        })
     });
 
     return res.json();
 }
 
-export async function rewriteRSE() {
-    return fetch("http://localhost:3001/api/cag/rewrite", {
-        method: "POST"
-    }).then(r => r.json());
-}
+// =====================================================
+// SESSÃO
+// =====================================================
 
 export async function endCAGSession() {
+
     return fetch("http://localhost:3001/api/cag/end-session", {
         method: "POST"
     });
+}
+
+export async function getSessionInfo() {
+
+    const res = await fetch("http://localhost:3001/api/cag/session-info", {
+        method: "GET"
+    });
+
+    return res.json();
 }

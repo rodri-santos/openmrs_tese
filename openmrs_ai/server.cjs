@@ -13,14 +13,12 @@ const upload = multer({
   storage: multer.memoryStorage()
 });
 
+// =====================================================
+// MIDDLEWARE
+// =====================================================
+
 app.use(cors());
 app.use(express.json());
-
-app.get('/', (req, res) => {
-  res.json({
-    message: 'OpenMRS AI Proxy Server is running.'
-  });
-});
 
 app.use((req, res, next) => {
   console.log("REQUEST:", req.method, req.url);
@@ -28,7 +26,17 @@ app.use((req, res, next) => {
 });
 
 // =====================================================
-// QA ROUTES
+// HEALTH CHECK
+// =====================================================
+
+app.get('/', (req, res) => {
+  res.json({
+    message: 'OpenMRS AI Proxy Server is running.'
+  });
+});
+
+// =====================================================
+// QA ROUTES (mantido igual)
 // =====================================================
 
 app.post(
@@ -48,38 +56,36 @@ app.post(
 );
 
 // =====================================================
-// CAG ROUTES
+// CAG ROUTES (NOVO MODELO)
 // =====================================================
 
+// upload único (RSE ou análises)
 app.post(
-  "/api/cag/upload-rse",
+  "/api/cag/upload",
   upload.single("file"),
-  cagController.uploadRSE
+  cagController.uploadDocument
 );
 
+// gerar documento com instrução
 app.post(
-  "/api/cag/upload-modulab",
-  upload.single("file"),
-  cagController.uploadModulab
+  "/api/cag/generate",
+  cagController.generateDocument
 );
 
-app.post(
-  "/api/cag/rewrite",
-  cagController.rewriteRSE
-);
-
+// reset sessão
 app.post(
   "/api/cag/end-session",
   cagController.endSession
 );
 
+// info sessão
 app.get(
   "/api/cag/session-info",
   cagController.getSessionInfo
 );
 
 // =====================================================
-// OPENMRS PROXY
+// OPENMRS PROXY (inalterado)
 // =====================================================
 
 app.use('/api', async (req, res) => {
@@ -117,7 +123,6 @@ app.use('/api', async (req, res) => {
         await axios({
 
           method: req.method,
-
           url,
 
           data:
@@ -151,20 +156,13 @@ app.use('/api', async (req, res) => {
             : undefined,
 
           responseType: 'stream',
-
           validateStatus: () => true,
         });
 
       res.status(axiosResponse.status);
 
-      Object.entries(
-        axiosResponse.headers
-      ).forEach(([key, value]) => {
-
-        if (
-          key.toLowerCase() !==
-          'content-length'
-        ) {
+      Object.entries(axiosResponse.headers).forEach(([key, value]) => {
+        if (key.toLowerCase() !== 'content-length') {
           res.set(key, value);
         }
       });
@@ -177,7 +175,6 @@ app.use('/api', async (req, res) => {
         await axios({
 
           method: req.method,
-
           url,
 
           data:
@@ -214,18 +211,13 @@ app.use('/api', async (req, res) => {
         });
 
       res.status(response.status);
-
       res.set(response.headers);
-
       res.send(response.data);
     }
 
   } catch (error) {
 
-    console.error(
-      'Proxy error:',
-      error.message
-    );
+    console.error('Proxy error:', error.message);
 
     res.status(500).json({
       error: 'Proxy Error',
@@ -234,8 +226,11 @@ app.use('/api', async (req, res) => {
   }
 });
 
-app.listen(port, () => {
+// =====================================================
+// START SERVER
+// =====================================================
 
+app.listen(port, () => {
   console.log(
     `Local proxy server running at http://localhost:${port}`
   );

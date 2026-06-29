@@ -63,7 +63,8 @@ async function callLLM(prompt) {
 
             body: JSON.stringify({
 
-                model: "gemma3:12b-it-qat",
+                //model: "gemma3:12b-it-qat",
+                model: "gemma4:latest",
 
                 prompt,
 
@@ -159,7 +160,9 @@ async function askQuestion(req, res) {
         const prompt = `
 És um assistente clínico QA.
 
-Responde APENAS com base no contexto.
+Responde APENAS com base no contexto e em PORTUGUÊS de PORTUGAL.
+
+Responde SEMPRE em PORTUGUÊS de PORTUGAL.
 
 Se a resposta não existir:
 

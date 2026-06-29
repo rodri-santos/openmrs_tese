@@ -1,24 +1,75 @@
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { uploadRSE, uploadModulab, rewriteRSE } from "../services/cagService";
+
+import {
+    uploadDocument,
+    generateDocument
+} from "../services/cagService";
 
 export default function CAGPage() {
 
+    const [files, setFiles] = useState([]);
+    const [instruction, setInstruction] = useState("");
     const [result, setResult] = useState("");
-    const [loading, setLoading] = useState(false);
+
+    const [loadingUpload, setLoadingUpload] = useState(false);
+    const [loadingGenerate, setLoadingGenerate] = useState(false);
     const [status, setStatus] = useState("");
 
-    const handleRewrite = async () => {
+    // =====================================================
+    // UPLOAD (MULTI-FICHEIROS)
+    // =====================================================
 
-        setLoading(true);
-        setStatus("A gerar registo atualizado...");
+    const handleFileUpload = async (e) => {
 
-        const res = await rewriteRSE();
+        const selectedFiles = Array.from(e.target.files);
+        if (!selectedFiles.length) return;
 
-        setResult(res.result);
-        setLoading(false);
-        setStatus("Concluído");
+        setLoadingUpload(true);
+        setStatus("A processar ficheiros...");
+
+        const uploadedNames = [];
+
+        for (const file of selectedFiles) {
+            await uploadDocument(file);
+            uploadedNames.push(file.name);
+        }
+
+        setFiles(prev => [...prev, ...uploadedNames]);
+
+        setLoadingUpload(false);
+        setStatus("Ficheiros carregados");
     };
+
+    // =====================================================
+    // GERAR RSE
+    // =====================================================
+
+    const handleGenerate = async () => {
+
+        if (!instruction.trim()) {
+            setStatus("Escreve uma instrução primeiro");
+            return;
+        }
+
+        setLoadingGenerate(true);
+        setStatus("A gerar RSE atualizado...");
+
+        try {
+            const res = await generateDocument(instruction);
+            setResult(res.result);
+            setStatus("Concluído");
+        } catch (err) {
+            console.error(err);
+            setStatus("Erro ao gerar documento");
+        }
+
+        setLoadingGenerate(false);
+    };
+
+    // =====================================================
+    // UI STYLES
+    // =====================================================
 
     const boxStyle = {
         background: "white",
@@ -38,10 +89,19 @@ export default function CAGPage() {
         fontWeight: "bold"
     };
 
+    const secondaryButtonStyle = {
+        ...buttonStyle,
+        background: "#10b981"
+    };
+
+    // =====================================================
+    // RENDER
+    // =====================================================
+
     return (
         <div style={{
             display: "grid",
-            gridTemplateColumns: "300px 1fr",
+            gridTemplateColumns: "320px 1fr",
             height: "100vh",
             background: "#f5f7fb",
             fontFamily: "Arial"
@@ -58,32 +118,70 @@ export default function CAGPage() {
                     CAG Clínico
                 </h2>
 
-                {/* RSE */}
+                {/* UPLOAD */}
                 <div style={boxStyle}>
-                    <h4>Registo de Saúde</h4>
+                    <h4>Adicionar documentos</h4>
+
                     <input
                         type="file"
-                        onChange={e => uploadRSE(e.target.files[0])}
+                        multiple
+                        onChange={handleFileUpload}
+                        disabled={loadingUpload}
                     />
+
+                    <p style={{
+                        fontSize: "12px",
+                        color: "#666",
+                        marginTop: "8px"
+                    }}>
+                        Os ficheiros são classificados automaticamente (RSE / análises)
+                    </p>
                 </div>
 
-                {/* MODULAB */}
+                {/* LISTA FICHEIROS */}
                 <div style={boxStyle}>
-                    <h4>Modulab</h4>
-                    <input
-                        type="file"
-                        onChange={e => uploadModulab(e.target.files[0])}
+                    <h4>Ficheiros carregados</h4>
+
+                    {files.length === 0 ? (
+                        <p style={{ fontSize: "12px", color: "#888" }}>
+                            Nenhum ficheiro carregado
+                        </p>
+                    ) : (
+                        <ul style={{ fontSize: "12px" }}>
+                            {files.map((f, i) => (
+                                <li key={i}>{f}</li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
+
+                {/* INSTRUÇÃO */}
+                <div style={boxStyle}>
+                    <h4>Instrução clínica</h4>
+
+                    <textarea
+                        rows={6}
+                        style={{
+                            width: "100%",
+                            borderRadius: "8px",
+                            border: "1px solid #ddd",
+                            padding: "8px"
+                        }}
+                        placeholder="Ex: Adicionar ao RSE os valores de hemoglobina, leucócitos e neutrófilos..."
+                        value={instruction}
+                        onChange={(e) => setInstruction(e.target.value)}
                     />
                 </div>
 
                 {/* ACTION */}
                 <div style={boxStyle}>
+
                     <button
-                        style={buttonStyle}
-                        onClick={handleRewrite}
-                        disabled={loading}
+                        style={secondaryButtonStyle}
+                        onClick={handleGenerate}
+                        disabled={loadingGenerate}
                     >
-                        {loading ? "A processar..." : "Gerar RSE atualizado"}
+                        {loadingGenerate ? "A gerar..." : "Gerar RSE atualizado"}
                     </button>
 
                     <p style={{
@@ -121,7 +219,7 @@ export default function CAGPage() {
                             <ReactMarkdown>{result}</ReactMarkdown>
                         ) : (
                             <p style={{ color: "#888" }}>
-                                O resultado aparecerá aqui após gerar o RSE atualizado.
+                                O resultado aparecerá aqui após geração.
                             </p>
                         )}
                     </div>

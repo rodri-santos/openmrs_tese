@@ -149,7 +149,7 @@ export default function QACAGPage() {
                         padding: 12
                     }}
 
-                    placeholder="Pergunta algo..."
+                    placeholder="Pergunta algo relacionado com o documento..."
                 />
 
                 <button onClick={handleAsk}>
