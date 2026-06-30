@@ -3,19 +3,27 @@ export default function Sidebar({ mode, setMode }) {
     const items = [
         {
             id: "update",
-            label: "Complementar Registo Consulta"
+            label: "Complementar Registo",
+            description:
+                "Atualiza automaticamente um Registo de Consulta com informação proveniente de análises clínicas."
         },
         {
             id: "qa",
-            label: "Pesquisa Informação num Documento"
+            label: "Pesquisa em Documento",
+            description:
+                "Permite colocar questões sobre um documento clínico utilizando Cache-Augmented Generation."
         },
         {
             id: "first",
-            label: "Gerar 1ª Consulta"
+            label: "Gerar 1ª Consulta",
+            description:
+                "Gera um registo estruturado para a primeira consulta de enfermagem com base na informação dada."
         },
         {
             id: "review",
-            label: "Rever/Corrigir Registo"
+            label: "Rever Registo",
+            description:
+                "Revê o texto do registo clínico, corrigindo erros ortográficos, gramaticais e de escrita."
         }
     ];
 
@@ -23,42 +31,94 @@ export default function Sidebar({ mode, setMode }) {
 
         <div
             style={{
-                background: "#fff",
-                borderRight: "1px solid #ddd",
+                width: 250,
+                background: "#1f2937",
+                color: "white",
+                display: "flex",
+                flexDirection: "column",
                 padding: 20
             }}
         >
 
-            <h2>CDSS</h2>
+            <h2
+                style={{
+                    marginBottom: 30,
+                    textAlign: "center",
+                    letterSpacing: 1
+                }}
+            >
+                CDSS
+            </h2>
 
-            {items.map(item => (
+            {items.map(item => {
 
-                <button
-                    key={item.id}
-                    onClick={() => setMode(item.id)}
-                    style={{
-                        width: "100%",
-                        marginBottom: 12,
-                        padding: 12,
-                        borderRadius: 8,
-                        border: "none",
-                        cursor: "pointer",
-                        textAlign: "left",
-                        background:
-                            mode === item.id
+                const active = mode === item.id;
+
+                return (
+
+                    <div
+                        key={item.id}
+                        style={{
+                            marginBottom: 14,
+                            borderRadius: 10,
+                            overflow: "hidden",
+                            background: active
                                 ? "#2563eb"
-                                : "#f3f4f6",
-                        color:
-                            mode === item.id
-                                ? "white"
-                                : "black",
-                        fontWeight: "bold"
-                    }}
-                >
-                    {item.label}
-                </button>
+                                : "#374151",
+                            transition: "all .25s"
+                        }}
+                    >
 
-            ))}
+                        <button
+                            onClick={() => setMode(item.id)}
+                            style={{
+                                width: "100%",
+                                padding: "14px 16px",
+                                border: "none",
+                                background: "transparent",
+                                color: "white",
+                                cursor: "pointer",
+                                textAlign: "left",
+                                fontSize: 15,
+                                fontWeight: 600
+                            }}
+                        >
+                            {item.label}
+                        </button>
+
+                        {active && (
+
+                            <div
+                                style={{
+                                    padding: "0 16px 16px",
+                                    fontSize: 13,
+                                    lineHeight: 1.5,
+                                    color: "#dbeafe",
+                                    borderTop: "1px solid rgba(255,255,255,.15)"
+                                }}
+                            >
+                                {item.description}
+                            </div>
+
+                        )}
+
+                    </div>
+
+                );
+
+            })}
+
+            <div
+                style={{
+                    marginTop: "auto",
+                    fontSize: 12,
+                    color: "#9ca3af",
+                    textAlign: "center"
+                }}
+            >
+                Sistema de Apoio à<br />
+                Decisão Clínica
+            </div>
 
         </div>
 

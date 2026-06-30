@@ -41,10 +41,6 @@ function detectDocumentType(text) {
         "res. anteriores",
         "res anteriores",
         "resultado",
-        //"leucócitos",
-        //"neutrófilos",
-        //"hemoglobina",
-        //"plaquetas"
     ];
 
     const matches = modulabKeywords.filter(k => t.includes(k)).length;

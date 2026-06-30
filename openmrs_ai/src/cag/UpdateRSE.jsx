@@ -6,7 +6,7 @@ import {
     generateDocument
 } from "../services/cagService";
 
-export default function CAGPage() {
+export default function UpdateRSE() {
 
     const [files, setFiles] = useState([]);
     const [instruction, setInstruction] = useState("");
@@ -16,10 +16,9 @@ export default function CAGPage() {
     const [loadingGenerate, setLoadingGenerate] = useState(false);
     const [status, setStatus] = useState("");
 
-    // =====================================================
-    // UPLOAD (MULTI-FICHEIROS)
-    // =====================================================
-
+    // ==============================
+    // UPLOAD
+    // ==============================
     const handleFileUpload = async (e) => {
 
         const selectedFiles = Array.from(e.target.files);
@@ -41,10 +40,9 @@ export default function CAGPage() {
         setStatus("Ficheiros carregados");
     };
 
-    // =====================================================
-    // GERAR RSE
-    // =====================================================
-
+    // ==============================
+    // GERAR
+    // ==============================
     const handleGenerate = async () => {
 
         if (!instruction.trim()) {
@@ -67,26 +65,26 @@ export default function CAGPage() {
         setLoadingGenerate(false);
     };
 
-    // =====================================================
-    // UI STYLES
-    // =====================================================
-
-    const boxStyle = {
-        background: "white",
-        borderRadius: "12px",
-        padding: "16px",
-        boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
-        marginBottom: "16px"
+    // ==============================
+    // STYLES
+    // ==============================
+    const panelStyle = {
+        background: "#f8fafc",
+        borderRadius: 14,
+        padding: 20,
+        marginBottom: 16,
+        border: "1px solid #e5e7eb"
     };
 
     const buttonStyle = {
-        padding: "10px 16px",
-        borderRadius: "8px",
+        padding: "10px 14px",
+        borderRadius: 10,
         border: "none",
         cursor: "pointer",
         background: "#2563eb",
         color: "white",
-        fontWeight: "bold"
+        fontWeight: 600,
+        width: "100%"
     };
 
     const secondaryButtonStyle = {
@@ -94,33 +92,25 @@ export default function CAGPage() {
         background: "#10b981"
     };
 
-    // =====================================================
-    // RENDER
-    // =====================================================
-
+    // ==============================
+    // UI
+    // ==============================
     return (
-        <div style={{
-            display: "grid",
-            gridTemplateColumns: "320px 1fr",
-            height: "100vh",
-            background: "#f5f7fb",
-            fontFamily: "Arial"
-        }}>
 
-            {/* LEFT PANEL */}
-            <div style={{
-                padding: "20px",
-                borderRight: "1px solid #e5e7eb",
-                background: "#ffffff"
-            }}>
+        <div
+            style={{
+                display: "grid",
+                gridTemplateColumns: "380px 1fr",
+                height: "100%",
+                gap: 0
+            }}
+        >
 
-                <h2 style={{ marginBottom: "20px" }}>
-                    Complementar Registo Consulta
-                </h2>
+            {/* LEFT TOOL PANEL */}
+            <div style={{ padding: 20, marginLeft: 45 }}>
 
-                {/* UPLOAD */}
-                <div style={boxStyle}>
-                    <h4>Adicionar documentos</h4>
+                <div style={panelStyle}>
+                    <h3 style={{ marginTop: 0 }}>Documentos</h3>
 
                     <input
                         type="file"
@@ -129,103 +119,107 @@ export default function CAGPage() {
                         disabled={loadingUpload}
                     />
 
-                    <p style={{
-                        fontSize: "12px",
-                        color: "#666",
-                        marginTop: "8px"
-                    }}>
+                    <p style={{ fontSize: 12, color: "#6b7280", marginTop: 8 }}>
                         Os ficheiros são classificados automaticamente (RSE / análises)
                     </p>
-                </div>
 
-                {/* LISTA FICHEIROS */}
-                <div style={boxStyle}>
-                    <h4>Ficheiros carregados</h4>
-
-                    {files.length === 0 ? (
-                        <p style={{ fontSize: "12px", color: "#888" }}>
-                            Nenhum ficheiro carregado
-                        </p>
-                    ) : (
-                        <ul style={{ fontSize: "12px" }}>
+                    {files.length > 0 && (
+                        <div style={{ marginTop: 10 }}>
                             {files.map((f, i) => (
-                                <li key={i}>{f}</li>
+                                <div
+                                    key={i}
+                                    style={{
+                                        fontSize: 12,
+                                        background: "#e0f2fe",
+                                        padding: "4px 8px",
+                                        borderRadius: 8,
+                                        marginBottom: 6
+                                    }}
+                                >
+                                    📎 {f}
+                                </div>
                             ))}
-                        </ul>
+                        </div>
                     )}
                 </div>
 
-                {/* INSTRUÇÃO */}
-                <div style={boxStyle}>
-                    <h4>Instrução clínica</h4>
+                <div style={panelStyle}>
+                    <h3 style={{ marginTop: 0 }}>Instrução clínica</h3>
 
                     <textarea
                         rows={6}
                         style={{
                             width: "100%",
-                            borderRadius: "8px",
-                            border: "1px solid #ddd",
-                            padding: "8px"
+                            borderRadius: 10,
+                            border: "1px solid #d1d5db",
+                            padding: 10,
+                            outline: "none",
+                            resize: "none"
                         }}
-                        placeholder="Ex: Adicionar ao RSE os valores de hemoglobina, leucócitos e neutrófilos..."
+                        placeholder="Ex: Atualizar hemoglobina, leucócitos e neutrófilos..."
                         value={instruction}
                         onChange={(e) => setInstruction(e.target.value)}
                     />
                 </div>
 
-                {/* ACTION */}
-                <div style={boxStyle}>
-
+                <div style={panelStyle}>
                     <button
                         style={secondaryButtonStyle}
                         onClick={handleGenerate}
                         disabled={loadingGenerate}
                     >
-                        {loadingGenerate ? "A gerar..." : "Gerar RSE atualizado"}
+                        {loadingGenerate ? "A gerar..." : "Atualizar RSE"}
                     </button>
 
-                    <p style={{
-                        marginTop: "10px",
-                        fontSize: "12px",
-                        color: "gray"
-                    }}>
+                    <p style={{ fontSize: 12, color: "#6b7280", marginTop: 10 }}>
                         {status}
                     </p>
                 </div>
+
             </div>
 
-            {/* RIGHT PANEL */}
-            <div style={{
-                padding: "20px",
-                overflowY: "auto"
-            }}>
+            {/* RIGHT OUTPUT */}
+            <div
+                style={{
+                    padding: 20,
+                    overflowY: "auto"
+                }}
+            >
 
-                <div style={{
-                    background: "white",
-                    padding: "20px",
-                    borderRadius: "12px",
-                    boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
-                    minHeight: "100%"
-                }}>
+                <div
+                    style={{
+                        background: "white",
+                        borderRadius: 14,
+                        padding: 24,
+                        minHeight: "100%",
+                        boxShadow: "0 4px 14px rgba(0,0,0,0.06)"
+                    }}
+                >
 
-                    <h3>Registo de Saúde Eletrónico Atualizado</h3>
+                    <h3 style={{ marginTop: 0 }}>
+                        Registo de Consulta Atualizado
+                    </h3>
 
-                    <div style={{
-                        marginTop: "20px",
-                        fontSize: "14px",
-                        lineHeight: "1.6"
-                    }}>
+                    <div
+                        style={{
+                            marginTop: 20,
+                            fontSize: 14,
+                            lineHeight: 1.6
+                        }}
+                    >
                         {result ? (
                             <ReactMarkdown>{result}</ReactMarkdown>
                         ) : (
-                            <p style={{ color: "#888" }}>
+                            <p style={{ color: "#9ca3af" }}>
                                 O resultado aparecerá aqui após geração.
                             </p>
                         )}
                     </div>
 
                 </div>
+
             </div>
+
         </div>
     );
 }
