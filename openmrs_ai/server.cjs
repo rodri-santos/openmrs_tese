@@ -5,6 +5,8 @@ const multer = require('multer');
 
 const cagController = require('./api/cag.cjs');
 const qaCagController = require("./api/qaCag.cjs");
+const firstConsultationController = require("./api/firstConsultation.cjs");
+const reviewRecordController = require("./api/reviewRecord.cjs");
 
 const app = express();
 const port = 3001;
@@ -12,10 +14,6 @@ const port = 3001;
 const upload = multer({
   storage: multer.memoryStorage()
 });
-
-// =====================================================
-// MIDDLEWARE
-// =====================================================
 
 app.use(cors());
 app.use(express.json());
@@ -25,9 +23,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// =====================================================
-// HEALTH CHECK
-// =====================================================
 
 app.get('/', (req, res) => {
   res.json({
@@ -35,9 +30,7 @@ app.get('/', (req, res) => {
   });
 });
 
-// =====================================================
-// QA ROUTES (mantido igual)
-// =====================================================
+// QA ROUTES 
 
 app.post(
   "/api/qa/upload",
@@ -56,8 +49,28 @@ app.post(
 );
 
 // =====================================================
-// CAG ROUTES (NOVO MODELO)
+// FIRST CONSULTATION
 // =====================================================
+
+app.post(
+
+  "/api/first-consultation/generate",
+
+  firstConsultationController.generateFirstConsultation
+
+);
+
+// =====================================================
+// REVIEW RECORD
+// =====================================================
+
+app.post(
+
+  "/api/review/generate",
+
+  reviewRecordController.reviewRecord
+
+);
 
 // upload único (RSE ou análises)
 app.post(

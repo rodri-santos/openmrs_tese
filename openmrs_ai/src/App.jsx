@@ -1,13 +1,11 @@
-// src/App.jsx
 import { Box } from '@chakra-ui/react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 
 import { OpenMRSProvider } from './contexts/OpenMRSContext'
 import { CAGProvider } from './contexts/CAGContext'
 
 import Layout from './components/Layout'
 import CAGPage from './components/CAGPage'
-import QACAGPage from "./components/QACAGPage";
 
 function App() {
   return (
@@ -17,11 +15,14 @@ function App() {
           <Box minH="100vh" bg="gray.50">
             <Routes>
 
-              {/* Rota principal com o teu layout e a Sidebar do OpenMRS */}
+              {/* sistema OpenMRS normal */}
               <Route path="/*" element={<Layout />} />
-              {/* Rota totalmente isolada para o CAG (ecrã inteiro) */}
+
+              {/* CDSS (o teu sistema novo) */}
               <Route path="/cag" element={<CAGPage />} />
-              <Route path="/qa" element={<QACAGPage />} />
+
+              {/* redirect opcional */}
+              <Route path="/" element={<Navigate to="/cag" replace />} />
 
             </Routes>
           </Box>
