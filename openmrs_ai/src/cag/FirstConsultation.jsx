@@ -76,7 +76,7 @@ export default function FirstConsultation() {
                 </div>
 
                 <div style={panelStyle}>
-                    <h3 style={{ marginTop: 0 }}>Instrução clínica</h3>
+                    <h3 style={{ marginTop: 0 }}>Notas clínicas</h3>
 
                     <textarea
                         rows={20}

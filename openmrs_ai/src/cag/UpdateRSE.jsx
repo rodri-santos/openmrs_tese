@@ -168,7 +168,7 @@ export default function UpdateRSE() {
                         onClick={handleGenerate}
                         disabled={loadingGenerate}
                     >
-                        {loadingGenerate ? "A gerar..." : "Atualizar RSE"}
+                        {loadingGenerate ? "A gerar..." : "Atualizar Registo"}
                     </button>
 
                     <p style={{ fontSize: 12, color: "#6b7280", marginTop: 10 }}>

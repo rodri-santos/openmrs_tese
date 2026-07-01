@@ -3,7 +3,6 @@ async function callLLM(prompt, temperature = 0.1) {
     const response = await fetch("http://localhost:11434/api/generate", {
 
         method: "POST",
-
         headers: {
             "Content-Type": "application/json"
         },
@@ -11,19 +10,13 @@ async function callLLM(prompt, temperature = 0.1) {
         body: JSON.stringify({
 
             model: "gemma3:12b-it-qat",
-
             prompt,
-
             stream: false,
-
             keep_alive: "20m",
 
             options: {
-
                 temperature,
-
                 num_predict: 1500
-
             }
 
         })
@@ -32,80 +25,70 @@ async function callLLM(prompt, temperature = 0.1) {
 
     const data = await response.json();
 
-    return data.response
+    return (data.response || "")
         .replace(/<\/?end_of_turn>/g, "")
         .trim();
-
 }
 
 async function reviewRecord(req, res) {
 
     const { record } = req.body;
 
+    if (!record || !record.trim()) {
+        return res.json({
+            success: false,
+            result: "Sem registo para rever."
+        });
+    }
+
     const prompt = `
-És um sistema de revisão documental clínica.
+És um assistente de revisão de registos clínicos.
 
 TAREFA:
-Revê e melhora a qualidade de escrita e estrutura do seguinte registo clínico.
+Melhorar a qualidade do texto clínico fornecido.
 
-CORRIGIR:
-- erros ortográficos
-- erros gramaticais
-- inconsistências
-- duplicações
-- linguagem pouco clínica
+REGRAS:
+- não inventar informação
+- não adicionar novos dados clínicos
+- não remover informação importante
+- corrigir apenas:
+  • ortografia
+  • gramática
+  • clareza
+  • estrutura
 
-REGRAS CRÍTICAS:
-- Nunca inventes informação
-- Nunca acrescentes informação clínica
-- Não removes informação clínica relevante
-- Mantém sempre o significado original
-
-FORMATAÇÃO OBRIGATÓRIA:
-- Responde em Markdown estruturado
-- Cada nova ideia clínica deve estar numa nova linha iniciada por "-"
-- Não usar parágrafos longos
-- Organizar informação de forma hierárquica quando apropriado
-- Subníveis devem ser indentados com 2-4 espaços + "-"
-
-RESPONDE APENAS EM JSON:
-
-{
-  "sections": [
-    {
-      "title": "",
-      "items": [
-        {
-          "label": "",
-          "value": "",
-          "children": []
-        }
-      ]
-    }
-  ]
-}
+FORMATAÇÃO:
+- texto clínico em formato limpo
+- usar bullets quando fizer sentido
+- manter linguagem médica profissional
+- português europeu
 
 REGISTO ORIGINAL:
 
 ${record}
 
-RESPOSTA:
+REGISTO REVISADO:
 `;
 
-    const result = await callLLM(prompt);
+    try {
 
-    res.json({
+        const result = await callLLM(prompt);
 
-        success: true,
+        return res.json({
+            success: true,
+            result
+        });
 
-        result
+    } catch (err) {
+        console.error("Review error:", err);
 
-    });
-
+        return res.status(500).json({
+            success: false,
+            result: "Erro ao rever registo."
+        });
+    }
 }
 
 module.exports = {
-
     reviewRecord
-
 };
