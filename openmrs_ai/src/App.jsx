@@ -6,6 +6,7 @@ import { CAGProvider } from './contexts/CAGContext'
 
 import Layout from './components/Layout'
 import CAGPage from './components/CAGPage'
+import CentralPage from "./components/CentralPage";
 
 function App() {
   return (
@@ -13,18 +14,23 @@ function App() {
       <OpenMRSProvider>
         <CAGProvider>
           <Box minH="100vh" bg="gray.50">
+
             <Routes>
 
               {/* sistema OpenMRS normal */}
               <Route path="/*" element={<Layout />} />
 
-              {/* CDSS (o teu sistema novo) */}
+              {/* CDSS (CAG antigo) */}
               <Route path="/cag" element={<CAGPage />} />
 
-              {/* redirect opcional */}
-              <Route path="/" element={<Navigate to="/cag" replace />} />
+              {/* 🧠 novo sistema central de registos */}
+              <Route path="/central" element={<CentralPage />} />
+
+              {/* redirect inicial */}
+              <Route path="/" element={<Navigate to="/central" replace />} />
 
             </Routes>
+
           </Box>
         </CAGProvider>
       </OpenMRSProvider>

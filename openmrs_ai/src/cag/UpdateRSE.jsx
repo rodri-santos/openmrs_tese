@@ -89,7 +89,7 @@ export default function UpdateRSE() {
 
     const secondaryButtonStyle = {
         ...buttonStyle,
-        background: "#10b981"
+        background: "#1f2937"
     };
 
     // ==============================

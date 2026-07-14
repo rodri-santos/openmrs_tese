@@ -17,7 +17,7 @@ export default function QACAGPage() {
             ...prev,
             {
                 role: "system",
-                text: `📄 PDF carregado: **${file.name}**`
+                text: `PDF carregado: **${file.name}**`
             }
         ]);
     };
@@ -170,7 +170,7 @@ export default function QACAGPage() {
                         padding: "10px 16px",
                         borderRadius: 10,
                         border: "none",
-                        background: "#2563eb",
+                        background: "#1f2937",
                         color: "white",
                         cursor: "pointer"
                     }}

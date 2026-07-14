@@ -64,7 +64,7 @@ export default function ReviewRecord() {
                     padding: "10px 18px",
                     borderRadius: 10,
                     border: "none",
-                    background: "#2563eb",
+                    background: "#1f2937",
                     color: "white",
                     cursor: "pointer",
                     fontWeight: 600

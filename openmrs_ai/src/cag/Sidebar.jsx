@@ -1,3 +1,7 @@
+import ipoLogo from "../assets/ipo.png";
+import deiLogo from "../assets/dei_logo.png";
+import ucLogo from "../assets/uc.png";
+
 export default function Sidebar({ mode, setMode }) {
 
     const items = [
@@ -28,7 +32,6 @@ export default function Sidebar({ mode, setMode }) {
     ];
 
     return (
-
         <div
             style={{
                 width: 250,
@@ -39,7 +42,6 @@ export default function Sidebar({ mode, setMode }) {
                 padding: 20
             }}
         >
-
             <h2
                 style={{
                     marginBottom: 30,
@@ -55,7 +57,6 @@ export default function Sidebar({ mode, setMode }) {
                 const active = mode === item.id;
 
                 return (
-
                     <div
                         key={item.id}
                         style={{
@@ -68,7 +69,6 @@ export default function Sidebar({ mode, setMode }) {
                             transition: "all .25s"
                         }}
                     >
-
                         <button
                             onClick={() => setMode(item.id)}
                             style={{
@@ -87,7 +87,6 @@ export default function Sidebar({ mode, setMode }) {
                         </button>
 
                         {active && (
-
                             <div
                                 style={{
                                     padding: "0 16px 16px",
@@ -99,11 +98,8 @@ export default function Sidebar({ mode, setMode }) {
                             >
                                 {item.description}
                             </div>
-
                         )}
-
                     </div>
-
                 );
 
             })}
@@ -111,17 +107,68 @@ export default function Sidebar({ mode, setMode }) {
             <div
                 style={{
                     marginTop: "auto",
-                    fontSize: 12,
-                    color: "#9ca3af",
                     textAlign: "center"
                 }}
             >
-                Sistema de Apoio à<br />
-                Decisão Clínica
+                <div
+                    style={{
+                        fontSize: 12,
+                        color: "#9ca3af",
+                        marginBottom: 18
+                    }}
+                >
+                    Sistema de Apoio à<br />
+                    Decisão Clínica
+                </div>
+
+                <div
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: 14
+                    }}
+                >
+                    <img
+                        src={ipoLogo}
+                        alt="IPO Coimbra"
+                        style={{
+                            maxWidth: 120,
+                            height: "auto",
+                            objectFit: "contain"
+                        }}
+                    />
+
+                    <img
+                        src={deiLogo}
+                        alt="DEI"
+                        style={{
+                            maxWidth: 150,
+                            height: "auto",
+                            objectFit: "contain"
+                        }}
+                    />
+
+                    <div
+                        style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            gap: 18
+                        }}
+                    >
+                        <img
+                            src={ucLogo}
+                            alt="ESEUC"
+                            style={{
+                                maxWidth: 105,
+                                height: "auto",
+                                objectFit: "contain"
+                            }}
+                        />
+                    </div>
+                </div>
             </div>
-
         </div>
-
     );
-
 }

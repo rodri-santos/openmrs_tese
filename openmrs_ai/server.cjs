@@ -7,6 +7,7 @@ const cagController = require('./api/cag.cjs');
 const qaCagController = require("./api/qaCag.cjs");
 const firstConsultationController = require("./api/firstConsultation.cjs");
 const reviewRecordController = require("./api/reviewRecord.cjs");
+const centralController = require("./api/central.cjs");
 
 const app = express();
 const port = 3001;
@@ -30,6 +31,34 @@ app.get('/', (req, res) => {
   });
 });
 
+// =====================================================
+// CENTRAL ROUTES
+// =====================================================
+
+app.post(
+  "/api/central/generate",
+  centralController.generateRecord
+);
+
+app.post(
+  "/api/central/edit",
+  centralController.editRecord
+);
+
+app.post(
+  "/api/central/undo",
+  centralController.undoEdit
+);
+
+app.post(
+  "/api/central/reset",
+  centralController.resetSession
+);
+
+app.get(
+  "/api/central/current",
+  centralController.getCurrentRecord
+);
 // QA ROUTES 
 
 app.post(
@@ -53,11 +82,13 @@ app.post(
 // =====================================================
 
 app.post(
-
   "/api/first-consultation/generate",
-
   firstConsultationController.generateFirstConsultation
+);
 
+app.post(
+  "/api/first-consultation/update",
+  firstConsultationController.updateFirstConsultation
 );
 
 // =====================================================
