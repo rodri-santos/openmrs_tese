@@ -75,8 +75,8 @@ export default function QACAGPage() {
         >
             {/* HEADER */}
             <div style={{ marginBottom: 10 }}>
-                <h2 style={{ margin: 0 }}>Question/Answer CAG</h2>
-                <p style={{ margin: 0, color: "#6b7280", fontSize: 13 }}>
+                <h2 style={{ margin: 0, fontWeight: "bold", fontSize: 25 }}>Question/Answer</h2>
+                <p style={{ margin: 0, color: "#6b7280", fontSize: 16 }}>
                     Perguntar sobre o conteúdo do documento carregado
                 </p>
             </div>

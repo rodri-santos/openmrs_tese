@@ -158,21 +158,22 @@ export default function FirstConsultation() {
                 </div>
 
                 <div style={panelStyle}>
-                    <h3 style={{ marginTop: 0 }}>Instruções</h3>
+                    <h3 style={{ marginLeft: 2, marginTop: 0, fontSize: 20, fontWeight: "bold" }}>Instruções</h3>
 
                     <textarea
                         rows={18}
                         value={instruction}
                         onChange={(e) => setInstruction(e.target.value)}
-                        placeholder="Ex.: adicionar antecedentes familiares, substituir idade, remover medicação..."
+                        placeholder="Ex.: descrever antecedentes familiares, sintomas, medicação, agendamentos..."
                         style={{
                             width: "100%",
-                            height: "56.7vh",
+                            height: "56.1vh",
                             resize: "vertical",
                             borderRadius: 10,
                             border: "1px solid #d1d5db",
                             padding: 10,
-                            fontSize: 14
+                            fontSize: 17,
+                            fontFamily: "arial"
                         }}
                     />
                 </div>
@@ -211,14 +212,23 @@ export default function FirstConsultation() {
                     }}
                 >
 
-                    <h3>Registo Clínico</h3>
+                    <h3
+                        style={{
+                            marginTop: -4,
+                            marginBottom: 16,
+                            fontSize: 25,
+                            fontWeight: "bold"
+                        }}
+                    >
+                        Registo Clínico
+                    </h3>
 
                     <textarea
                         value={record}
                         onChange={(e) => setRecord(e.target.value)}
                         style={{
                             width: "100%",
-                            height: "80.1vh",
+                            height: "77.2vh",
                             resize: "none",
                             border: "1px solid #d1d5db",
                             borderRadius: 10,

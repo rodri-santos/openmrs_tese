@@ -110,7 +110,7 @@ export default function UpdateRSE() {
             <div style={{ padding: 20, marginLeft: 45 }}>
 
                 <div style={panelStyle}>
-                    <h3 style={{ marginTop: 0 }}>Documentos</h3>
+                    <h3 style={{ marginTop: 0, fontWeight: "bold", fontSize: 25 }}>Documentos</h3>
 
                     <input
                         type="file"
@@ -144,17 +144,19 @@ export default function UpdateRSE() {
                 </div>
 
                 <div style={panelStyle}>
-                    <h3 style={{ marginTop: 0 }}>Instrução clínica</h3>
+                    <h3 style={{ marginLeft: 2, marginTop: 0, fontWeight: "bold", fontSize: 20 }}>Instrução Clínica</h3>
 
                     <textarea
                         rows={6}
                         style={{
                             width: "100%",
                             borderRadius: 10,
+                            height: "40vh",
                             border: "1px solid #d1d5db",
                             padding: 10,
                             outline: "none",
-                            resize: "none"
+                            resize: "none",
+                            fontSize: 17
                         }}
                         placeholder="Ex: Atualizar hemoglobina, leucócitos e neutrófilos..."
                         value={instruction}
@@ -196,7 +198,7 @@ export default function UpdateRSE() {
                     }}
                 >
 
-                    <h3 style={{ marginTop: 0 }}>
+                    <h3 style={{ marginTop: 0, fontWeight: "bold", fontSize: 25 }}>
                         Registo de Consulta Atualizado
                     </h3>
 
@@ -210,7 +212,7 @@ export default function UpdateRSE() {
                         {result ? (
                             <ReactMarkdown>{result}</ReactMarkdown>
                         ) : (
-                            <p style={{ color: "#9ca3af" }}>
+                            <p style={{ color: "#9ca3af", fontSize: 17 }}>
                                 O resultado aparecerá aqui após geração.
                             </p>
                         )}
