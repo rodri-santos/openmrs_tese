@@ -96,21 +96,30 @@ export default function UpdateRSE() {
     // UI
     // ==============================
     return (
-
         <div
             style={{
                 display: "grid",
-                gridTemplateColumns: "380px 1fr",
-                height: "100%",
-                gap: 0
+                gridTemplateColumns: "minmax(320px, 380px) 1fr",
+                height: "calc(100vh - 40px)",
+                gap: 20,
+                padding: 20,
+                boxSizing: "border-box"
             }}
         >
 
-            {/* LEFT TOOL PANEL */}
-            <div style={{ padding: 20, marginLeft: 45 }}>
+            {/* LEFT */}
+            <div
+                style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 16
+                }}
+            >
 
                 <div style={panelStyle}>
-                    <h3 style={{ marginTop: 0, fontWeight: "bold", fontSize: 25 }}>Documentos</h3>
+                    <h3 style={{ marginTop: 0, fontWeight: "bold", fontSize: 25 }}>
+                        Documentos
+                    </h3>
 
                     <input
                         type="file"
@@ -119,7 +128,13 @@ export default function UpdateRSE() {
                         disabled={loadingUpload}
                     />
 
-                    <p style={{ fontSize: 12, color: "#6b7280", marginTop: 8 }}>
+                    <p
+                        style={{
+                            fontSize: 12,
+                            color: "#6b7280",
+                            marginTop: 8
+                        }}
+                    >
                         Os ficheiros são classificados automaticamente (RSE / análises)
                     </p>
 
@@ -144,23 +159,34 @@ export default function UpdateRSE() {
                 </div>
 
                 <div style={panelStyle}>
-                    <h3 style={{ marginLeft: 2, marginTop: 0, fontWeight: "bold", fontSize: 20 }}>Instrução Clínica</h3>
+                    <h3
+                        style={{
+                            marginLeft: 2,
+                            marginTop: 0,
+                            fontWeight: "bold",
+                            fontSize: 20
+                        }}
+                    >
+                        Instrução Clínica
+                    </h3>
 
                     <textarea
                         rows={6}
+                        value={instruction}
+                        onChange={(e) => setInstruction(e.target.value)}
+                        placeholder="Ex: Atualizar hemoglobina, leucócitos e neutrófilos..."
                         style={{
                             width: "100%",
+                            height: "32vh",
+                            minHeight: 220,
+                            maxHeight: 420,
                             borderRadius: 10,
-                            height: "40vh",
                             border: "1px solid #d1d5db",
                             padding: 10,
                             outline: "none",
                             resize: "none",
                             fontSize: 17
                         }}
-                        placeholder="Ex: Atualizar hemoglobina, leucócitos e neutrófilos..."
-                        value={instruction}
-                        onChange={(e) => setInstruction(e.target.value)}
                     />
                 </div>
 
@@ -173,18 +199,24 @@ export default function UpdateRSE() {
                         {loadingGenerate ? "A gerar..." : "Atualizar Registo"}
                     </button>
 
-                    <p style={{ fontSize: 12, color: "#6b7280", marginTop: 10 }}>
+                    <p
+                        style={{
+                            fontSize: 12,
+                            color: "#6b7280",
+                            marginTop: 10
+                        }}
+                    >
                         {status}
                     </p>
                 </div>
 
             </div>
 
-            {/* RIGHT OUTPUT */}
+            {/* RIGHT */}
             <div
                 style={{
-                    padding: 20,
-                    overflowY: "auto"
+                    display: "flex",
+                    overflow: "hidden"
                 }}
             >
 
@@ -193,27 +225,46 @@ export default function UpdateRSE() {
                         background: "white",
                         borderRadius: 14,
                         padding: 24,
-                        minHeight: "100%",
-                        boxShadow: "0 4px 14px rgba(0,0,0,0.06)"
+                        width: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        boxShadow: "0 4px 14px rgba(0,0,0,.06)"
                     }}
                 >
 
-                    <h3 style={{ marginTop: 0, fontWeight: "bold", fontSize: 25 }}>
-                        Registo de Consulta Atualizado
+                    <h3
+                        style={{
+                            marginTop: 0,
+                            fontWeight: "bold",
+                            fontSize: 25
+                        }}
+                    >
+                        Registo Clínico Atualizado
                     </h3>
 
                     <div
                         style={{
                             marginTop: 20,
-                            fontSize: 14,
+                            flex: 1,
+                            overflowY: "auto",
+                            border: "1px solid #d1d5db",
+                            borderRadius: 10,
+                            padding: 18,
+                            fontSize: 17,
                             lineHeight: 1.6
                         }}
                     >
                         {result ? (
                             <ReactMarkdown>{result}</ReactMarkdown>
                         ) : (
-                            <p style={{ color: "#9ca3af", fontSize: 17 }}>
-                                O resultado aparecerá aqui após geração.
+                            <p
+                                style={{
+                                    color: "#9ca3af",
+                                    fontSize: 17,
+                                    fontWeight: "bold"
+                                }}
+                            >
+                                O resultado aparecerá aqui.
                             </p>
                         )}
                     </div>

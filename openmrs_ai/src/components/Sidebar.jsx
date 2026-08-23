@@ -334,12 +334,12 @@ const Sidebar = () => {
             colorScheme="purple"
             variant="solid"
             width="100%"
-            onClick={() => navigate('/cag')}
+            onClick={() => navigate('/cdss')}
             boxShadow="md"
             _hover={{ transform: 'translateY(-2px)', boxShadow: 'lg' }}
             transition="all 0.2s"
           >
-            CAG (PDFs)
+            CDSS
           </Button>
           <Text fontSize="xs" color="gray.500" mt={2} textAlign="center">
             Analisar documentos num ambiente isolado.

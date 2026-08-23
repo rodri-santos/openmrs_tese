@@ -27,6 +27,9 @@ async function callLLM(prompt, temperature = 0.1) {
 
     return (data.response || "")
         .replace(/<\/?end_of_turn>/g, "")
+        .replace(/Registo Clínico Revisado/gi, "Registo Clínico Revisto")
+        .replace(/\bRevisado\b/gi, "Revisto")
+        .replace(/\brevisado\b/gi, "revisto")
         .trim();
 }
 

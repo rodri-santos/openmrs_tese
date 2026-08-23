@@ -65,28 +65,42 @@ export default function QACAGPage() {
     return (
         <div
             style={{
-                maxWidth: 900,
-                margin: "0 auto",
-                padding: 20,
                 display: "flex",
                 flexDirection: "column",
-                height: "100vh"
+                height: "calc(100vh - 40px)",
+                padding: 20,
+                boxSizing: "border-box"
             }}
         >
             {/* HEADER */}
-            <div style={{ marginBottom: 10 }}>
-                <h2 style={{ margin: 0, fontWeight: "bold", fontSize: 25 }}>Question/Answer</h2>
-                <p style={{ margin: 0, color: "#6b7280", fontSize: 16 }}>
-                    Perguntar sobre o conteúdo do documento carregado
+            <div style={{ marginBottom: 15 }}>
+                <h2
+                    style={{
+                        margin: 0,
+                        fontWeight: "bold",
+                        fontSize: 25
+                    }}
+                >
+                    Pesquisa de Informação
+                </h2>
+
+                <p
+                    style={{
+                        marginTop: 6,
+                        color: "#6b7280",
+                        fontSize: 16
+                    }}
+                >
+                    Juntar informação presente no documento carregado.
                 </p>
             </div>
 
-            {/* UPLOAD CARD */}
+            {/* UPLOAD */}
             <div
                 style={{
                     background: "white",
                     border: "1px solid #e5e7eb",
-                    padding: 12,
+                    padding: 14,
                     borderRadius: 12,
                     marginBottom: 15
                 }}
@@ -98,17 +112,19 @@ export default function QACAGPage() {
                 />
             </div>
 
-            {/* CHAT AREA */}
+            {/* CHAT */}
             <div
                 style={{
                     flex: 1,
                     overflowY: "auto",
                     display: "flex",
                     flexDirection: "column",
-                    gap: 10,
-                    padding: 10,
-                    background: "#fafafa",
-                    borderRadius: 12
+                    gap: 12,
+                    padding: 18,
+                    background: "white",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: 12,
+                    minHeight: 0
                 }}
             >
                 {messages.map((m, i) => (
@@ -134,45 +150,44 @@ export default function QACAGPage() {
                 )}
             </div>
 
-            {/* INPUT BAR */}
+            {/* INPUT */}
             <div
                 style={{
                     display: "flex",
                     gap: 10,
-                    marginTop: 10,
-                    padding: 10,
-                    background: "white",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: 12
+                    marginTop: 15,
+                    flexWrap: "wrap"
                 }}
             >
                 <input
                     value={question}
-                    onChange={(e) =>
-                        setQuestion(e.target.value)
-                    }
-                    placeholder="Pergunte algo sobre o documento..."
-                    style={{
-                        flex: 1,
-                        padding: 12,
-                        borderRadius: 10,
-                        border: "1px solid #e5e7eb",
-                        outline: "none"
-                    }}
+                    onChange={(e) => setQuestion(e.target.value)}
+                    placeholder="Que informação deseja obter do documento..."
                     onKeyDown={(e) => {
                         if (e.key === "Enter") handleAsk();
+                    }}
+                    style={{
+                        flex: 1,
+                        minWidth: 250,
+                        padding: 12,
+                        borderRadius: 10,
+                        border: "1px solid #d1d5db",
+                        outline: "none",
+                        fontSize: 16
                     }}
                 />
 
                 <button
                     onClick={handleAsk}
                     style={{
-                        padding: "10px 16px",
+                        padding: "10px 18px",
                         borderRadius: 10,
-                        border: "none",
+                        border: "1px solid #d1d5db",
                         background: "#1f2937",
                         color: "white",
-                        cursor: "pointer"
+                        cursor: "pointer",
+                        fontWeight: 600,
+                        whiteSpace: "nowrap"
                     }}
                 >
                     Enviar

@@ -66,10 +66,11 @@ export default function ReviewRecord() {
         <div
             style={{
                 display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: 24,
+                gridTemplateColumns: "repeat(auto-fit, minmax(420px, 1fr))",
+                gap: 20,
                 padding: 20,
-                height: "100%"
+                height: "calc(100vh - 40px)",
+                boxSizing: "border-box"
             }}
         >
 
@@ -83,7 +84,7 @@ export default function ReviewRecord() {
                     boxShadow: "0 4px 14px rgba(0,0,0,.08)",
                     display: "flex",
                     flexDirection: "column",
-                    marginLeft: 30
+                    overflow: "hidden"
                 }}
             >
 
@@ -92,11 +93,19 @@ export default function ReviewRecord() {
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "center",
-                        marginBottom: 15
+                        marginBottom: 15,
+                        gap: 10,
+                        flexWrap: "wrap"
                     }}
                 >
 
-                    <h3 style={{ margin: 0, fontSize: 25, fontWeight: "bold" }}>
+                    <h3
+                        style={{
+                            margin: 0,
+                            fontSize: 25,
+                            fontWeight: "bold"
+                        }}
+                    >
                         Registo Clínico Original
                     </h3>
 
@@ -110,7 +119,8 @@ export default function ReviewRecord() {
                             background: "#1f2937",
                             color: "#ffffff",
                             cursor: "pointer",
-                            fontWeight: 600
+                            fontWeight: 600,
+                            whiteSpace: "nowrap"
                         }}
                     >
                         {loading ? "A rever..." : "Rever Registo"}
@@ -121,16 +131,17 @@ export default function ReviewRecord() {
                 <textarea
                     value={record}
                     onChange={(e) => setRecord(e.target.value)}
-                    placeholder="Cole um registo clínico para rever a qualidade da escrita, corrigir erros ortográficos, gramaticais e melhorar a estrutura documental."
+                    placeholder="Cole um registo clínico para rever a qualidade da escrita, corrigir erros ortográficos, gramaticais e melhorar a estrutura do documento."
                     style={{
                         flex: 1,
                         resize: "none",
                         border: "1px solid #d1d5db",
                         borderRadius: 10,
                         padding: 15,
-                        fontFamily: "arial",
+                        fontFamily: "Arial",
                         fontSize: 16,
-                        lineHeight: 1.6
+                        lineHeight: 1.6,
+                        minHeight: 0
                     }}
                 />
 
@@ -145,7 +156,8 @@ export default function ReviewRecord() {
                     padding: 20,
                     boxShadow: "0 4px 14px rgba(0,0,0,.08)",
                     display: "flex",
-                    flexDirection: "column"
+                    flexDirection: "column",
+                    overflow: "hidden"
                 }}
             >
 
@@ -154,11 +166,19 @@ export default function ReviewRecord() {
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "center",
-                        marginBottom: 15
+                        marginBottom: 15,
+                        gap: 10,
+                        flexWrap: "wrap"
                     }}
                 >
 
-                    <h3 style={{ margin: 0, fontSize: 25, fontWeight: "bold" }}>
+                    <h3
+                        style={{
+                            margin: 0,
+                            fontSize: 25,
+                            fontWeight: "bold"
+                        }}
+                    >
                         Registo Clínico Revisto
                     </h3>
 
@@ -176,7 +196,8 @@ export default function ReviewRecord() {
                             background: "#1f2937",
                             color: "#ffffff",
                             cursor: result ? "pointer" : "default",
-                            fontWeight: 600
+                            fontWeight: 600,
+                            whiteSpace: "nowrap"
                         }}
                     >
                         Copiar
@@ -190,15 +211,24 @@ export default function ReviewRecord() {
                         border: "1px solid #d1d5db",
                         borderRadius: 10,
                         padding: 15,
+                        paddingLeft: 25,
                         overflowY: "auto",
                         lineHeight: 1.6,
-                        fontSize: 14
+                        fontSize: 14,
+                        minHeight: 0
                     }}
                 >
                     {result ? (
                         <ReactMarkdown>{result}</ReactMarkdown>
                     ) : (
-                        <p style={{ color: "#9ca3af", fontFamily: "Arial", fontSize: 16 }}>
+                        <p
+                            style={{
+                                color: "#9ca3af",
+                                fontFamily: "Arial",
+                                fontSize: 16,
+                                fontWeight: "bold"
+                            }}
+                        >
                             O resultado da revisão aparecerá aqui.
                         </p>
                     )}

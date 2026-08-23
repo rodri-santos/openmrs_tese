@@ -1,4 +1,5 @@
 import ipoLogo from "../assets/ipo.png";
+import digitalPersonLogo from "../assets/digital_person.png";
 import deiLogo from "../assets/dei_logo.png";
 import ucLogo from "../assets/uc.png";
 
@@ -6,40 +7,53 @@ export default function Sidebar({ mode, setMode }) {
 
     const items = [
         {
-            id: "update",
-            label: "Complementar Registo",
-            description:
-                "Atualiza automaticamente um Registo de Consulta com informação proveniente de análises clínicas."
-        },
-        {
-            id: "qa",
-            label: "Pesquisa em Documento",
-            description:
-                "Permite colocar questões sobre um documento clínico utilizando Cache-Augmented Generation."
-        },
-        {
             id: "first",
             label: "Gerar 1ª Consulta",
             description:
                 "Gera um registo estruturado para a primeira consulta de enfermagem com base na informação dada."
         },
         {
+            id: "comprehensive",
+            label: "Consulta Completa",
+            description:
+                "Gera um novo registo de uma consulta subsequente utilizando a primeira consulta, análises clínicas e instruções do enfermeiro."
+        },
+        {
+            id: "update",
+            label: "Complementar Registo",
+            description:
+                "Atualiza um Registo Clínico com a informação pretendida, proveniente de análises clínicas."
+        },
+        {
             id: "review",
             label: "Rever Registo",
             description:
                 "Revê o texto do registo clínico, corrigindo erros ortográficos, gramaticais e de escrita."
+        },
+        {
+            id: "qa",
+            label: "Pesquisa em Documento",
+            description:
+                "Permite colocar questões sobre um documento clínico utilizando Cache-Augmented Generation."
         }
     ];
 
     return (
         <div
             style={{
-                width: 250,
+                width: "18vw",
+                minWidth: 240,
+                maxWidth: 280,
                 background: "#1f2937",
                 color: "white",
                 display: "flex",
                 flexDirection: "column",
-                padding: 20
+                padding: 20,
+                flexShrink: 0,
+                position: "relative",
+                zIndex: 9999,
+                overflowY: "auto",
+                boxSizing: "border-box"
             }}
         >
             <h2
@@ -63,9 +77,7 @@ export default function Sidebar({ mode, setMode }) {
                             marginBottom: 14,
                             borderRadius: 10,
                             overflow: "hidden",
-                            background: active
-                                ? "#2563eb"
-                                : "#374151",
+                            background: active ? "#2563eb" : "#374151",
                             transition: "all .25s"
                         }}
                     >
@@ -112,7 +124,7 @@ export default function Sidebar({ mode, setMode }) {
             >
                 <div
                     style={{
-                        fontSize: 12,
+                        fontSize: 14,
                         color: "#9ca3af",
                         marginBottom: 18
                     }}
@@ -126,14 +138,24 @@ export default function Sidebar({ mode, setMode }) {
                         display: "flex",
                         flexDirection: "column",
                         alignItems: "center",
-                        gap: 14
+                        gap: 12
                     }}
                 >
+                    <img
+                        src={digitalPersonLogo}
+                        alt="Digital Person"
+                        style={{
+                            maxWidth: 170,
+                            height: "auto",
+                            objectFit: "contain"
+                        }}
+                    />
+
                     <img
                         src={ipoLogo}
                         alt="IPO Coimbra"
                         style={{
-                            maxWidth: 120,
+                            maxWidth: 105,
                             height: "auto",
                             objectFit: "contain"
                         }}
@@ -143,30 +165,22 @@ export default function Sidebar({ mode, setMode }) {
                         src={deiLogo}
                         alt="DEI"
                         style={{
-                            maxWidth: 150,
+                            maxWidth: 135,
                             height: "auto",
                             objectFit: "contain"
                         }}
                     />
 
-                    <div
+                    <img
+                        src={ucLogo}
+                        alt="Universidade de Coimbra"
                         style={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            gap: 18
+                            maxWidth: 90,
+                            height: "auto",
+                            objectFit: "contain"
                         }}
-                    >
-                        <img
-                            src={ucLogo}
-                            alt="ESEUC"
-                            style={{
-                                maxWidth: 105,
-                                height: "auto",
-                                objectFit: "contain"
-                            }}
-                        />
-                    </div>
+                    />
+
                 </div>
             </div>
         </div>

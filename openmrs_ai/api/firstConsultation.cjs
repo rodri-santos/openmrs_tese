@@ -65,6 +65,7 @@ Regras obrigatórias:
 - Mantém uma linguagem profissional.
 - Responde apenas com o registo.
 - É enfermagem em vez de enfermeiragem.
+- No fim, quero sempre "Enfermeiro Responsável: [Nome]".
 
 Notas clínicas:
 

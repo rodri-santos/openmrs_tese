@@ -1,5 +1,5 @@
 import { Box } from '@chakra-ui/react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 import { OpenMRSProvider } from './contexts/OpenMRSContext'
 import { CAGProvider } from './contexts/CAGContext'
@@ -17,17 +17,14 @@ function App() {
 
             <Routes>
 
-              {/* sistema OpenMRS normal */}
+              {/* OpenMRS */}
               <Route path="/*" element={<Layout />} />
 
-              {/* CDSS (CAG antigo) */}
-              <Route path="/cag" element={<CAGPage />} />
+              {/* CDSS */}
+              <Route path="/cdss" element={<CAGPage />} />
 
-              {/* 🧠 novo sistema central de registos */}
+              {/* Sistema central */}
               <Route path="/central" element={<CentralPage />} />
-
-              {/* redirect inicial */}
-              <Route path="/" element={<Navigate to="/central" replace />} />
 
             </Routes>
 

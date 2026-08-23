@@ -146,34 +146,68 @@ export default function FirstConsultation() {
         fontWeight: 600
     };
     return (
-        <div style={{ display: "grid", gridTemplateColumns: "380px 1fr", height: "100%" }}>
+        <div
+            style={{
+                display: "grid",
+                gridTemplateColumns: "minmax(340px, 380px) 1fr",
+                gap: 20,
+                height: "calc(100vh - 40px)",
+                padding: 20,
+                boxSizing: "border-box"
+            }}
+        >
             {/* LEFT */}
-            <div style={{ padding: 20, marginLeft: 45 }}>
-
+            <div
+                style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    minHeight: 0
+                }}
+            >
                 <div style={panelStyle}>
-                    <h3 style={{ marginTop: 0 }}>Gerar e Trabalhar Registo da 1ª Consulta</h3>
-                    <p style={{ color: "#6b7280", fontSize: 13 }}>
-                        Gera um registo com notas iniciais que pode ser iterativamente trabalhado com novas instruções ou com edição manual.
+                    <h3 style={{ marginTop: 0, fontWeight: "bold", fontSize: 23 }}>
+                        Gerar e Trabalhar Registo da 1ª Consulta
+                    </h3>
+
+                    <p style={{ color: "#6b7280", fontSize: 16.3 }}>
+                        Gera um registo com notas iniciais que pode ser iterativamente
+                        trabalhado com novas instruções ou com edição manual.
                     </p>
                 </div>
 
-                <div style={panelStyle}>
-                    <h3 style={{ marginLeft: 2, marginTop: 0, fontSize: 20, fontWeight: "bold" }}>Instruções</h3>
+                <div
+                    style={{
+                        ...panelStyle,
+                        flex: 1,
+                        display: "flex",
+                        flexDirection: "column"
+                    }}
+                >
+                    <h3
+                        style={{
+                            marginLeft: 2,
+                            marginTop: 0,
+                            fontSize: 20,
+                            fontWeight: "bold"
+                        }}
+                    >
+                        Instruções
+                    </h3>
 
                     <textarea
-                        rows={18}
                         value={instruction}
                         onChange={(e) => setInstruction(e.target.value)}
                         placeholder="Ex.: descrever antecedentes familiares, sintomas, medicação, agendamentos..."
                         style={{
+                            flex: 1,
                             width: "100%",
-                            height: "56.1vh",
-                            resize: "vertical",
+                            resize: "none",
                             borderRadius: 10,
                             border: "1px solid #d1d5db",
                             padding: 10,
                             fontSize: 17,
-                            fontFamily: "arial"
+                            fontFamily: "Arial",
+                            boxSizing: "border-box"
                         }}
                     />
                 </div>
@@ -197,24 +231,31 @@ export default function FirstConsultation() {
                         </button>
                     )}
                 </div>
-
             </div>
 
             {/* RIGHT */}
-            <div style={{ padding: 20, overflowY: "auto" }}>
-
+            <div
+                style={{
+                    minHeight: 0,
+                    display: "flex",
+                    flexDirection: "column"
+                }}
+            >
                 <div
                     style={{
                         background: "white",
                         borderRadius: 14,
                         padding: 24,
-                        boxShadow: "0 4px 14px rgba(0,0,0,.08)"
+                        boxShadow: "0 4px 14px rgba(0,0,0,.08)",
+                        display: "flex",
+                        flexDirection: "column",
+                        flex: 1,
+                        minHeight: 0
                     }}
                 >
-
                     <h3
                         style={{
-                            marginTop: -4,
+                            marginTop: 0,
                             marginBottom: 16,
                             fontSize: 25,
                             fontWeight: "bold"
@@ -227,26 +268,26 @@ export default function FirstConsultation() {
                         value={record}
                         onChange={(e) => setRecord(e.target.value)}
                         style={{
+                            flex: 1,
                             width: "100%",
-                            height: "77.2vh",
                             resize: "none",
                             border: "1px solid #d1d5db",
                             borderRadius: 10,
                             padding: 15,
                             fontFamily: "monospace",
                             fontSize: 14,
-                            lineHeight: 1.6
+                            lineHeight: 1.6,
+                            boxSizing: "border-box"
                         }}
                     />
 
                     <div
                         style={{
                             display: "flex",
-                            gap: 5,
-                            marginTop: 10
+                            gap: 8,
+                            marginTop: 12
                         }}
                     >
-
                         <button
                             onClick={handleUndo}
                             disabled={history.length === 0}
@@ -269,13 +310,9 @@ export default function FirstConsultation() {
                         >
                             PDF
                         </button>
-
                     </div>
-
                 </div>
-
             </div>
-
         </div>
     );
 }
