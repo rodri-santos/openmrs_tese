@@ -1,3 +1,4 @@
+//after nurse feedback, not yet ready for deployment
 import { useState } from "react";
 import jsPDF from "jspdf";
 import { marked } from "marked";
@@ -18,7 +19,6 @@ export default function ComprehensiveConsultation() {
             const formData = new FormData();
             formData.append("file", file);
             try {
-                // Alterado para o endpoint que já tens a funcionar
                 const res = await fetch("http://localhost:3001/api/cag/upload", {
                     method: "POST",
                     body: formData,

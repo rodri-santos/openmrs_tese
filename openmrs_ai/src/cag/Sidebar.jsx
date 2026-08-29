@@ -12,12 +12,12 @@ export default function Sidebar({ mode, setMode }) {
             description:
                 "Gera um registo estruturado para a primeira consulta de enfermagem com base na informação dada."
         },
-        {
+        /*{ //after nurse feedback, not yet ready for deployment
             id: "comprehensive",
             label: "Consulta Completa",
             description:
                 "Gera um novo registo de uma consulta subsequente utilizando a primeira consulta, análises clínicas e instruções do enfermeiro."
-        },
+        },*/
         {
             id: "update",
             label: "Complementar Registo",
@@ -34,7 +34,7 @@ export default function Sidebar({ mode, setMode }) {
             id: "qa",
             label: "Pesquisa em Documento",
             description:
-                "Permite colocar questões sobre um documento clínico utilizando Cache-Augmented Generation."
+                "Permite colocar questões sobre um documento clínico e obter respostas."
         }
     ];
 
@@ -122,17 +122,6 @@ export default function Sidebar({ mode, setMode }) {
                     textAlign: "center"
                 }}
             >
-                <div
-                    style={{
-                        fontSize: 14,
-                        color: "#9ca3af",
-                        marginBottom: 18
-                    }}
-                >
-                    Sistema de Apoio à<br />
-                    Decisão Clínica
-                </div>
-
                 <div
                     style={{
                         display: "flex",

@@ -16,9 +16,7 @@ export default function UpdateRSE() {
     const [loadingGenerate, setLoadingGenerate] = useState(false);
     const [status, setStatus] = useState("");
 
-    // ==============================
-    // UPLOAD
-    // ==============================
+
     const handleFileUpload = async (e) => {
 
         const selectedFiles = Array.from(e.target.files);
@@ -40,9 +38,6 @@ export default function UpdateRSE() {
         setStatus("Ficheiros carregados");
     };
 
-    // ==============================
-    // GERAR
-    // ==============================
     const handleGenerate = async () => {
 
         if (!instruction.trim()) {
@@ -65,9 +60,6 @@ export default function UpdateRSE() {
         setLoadingGenerate(false);
     };
 
-    // ==============================
-    // STYLES
-    // ==============================
     const panelStyle = {
         background: "#f8fafc",
         borderRadius: 14,

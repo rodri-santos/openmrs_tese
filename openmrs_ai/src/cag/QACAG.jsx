@@ -91,7 +91,7 @@ export default function QACAGPage() {
                         fontSize: 16
                     }}
                 >
-                    Juntar informação presente no documento carregado.
+                    Obter informação presente no documento carregado.
                 </p>
             </div>
 

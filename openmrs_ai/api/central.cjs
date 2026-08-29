@@ -1,3 +1,4 @@
+//test, not used
 const fetch = global.fetch;
 
 let currentRecord = "";

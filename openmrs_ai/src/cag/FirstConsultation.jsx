@@ -91,7 +91,6 @@ export default function FirstConsultation() {
                 doc.addPage();
                 y = 10;
             }
-            // heurística simples de headings
             if (line.startsWith("REGISTO") || line.includes("CONSULTA")) {
                 doc.setFontSize(14);
                 doc.setFont("helvetica", "bold");
