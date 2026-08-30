@@ -22,7 +22,7 @@ export default function Sidebar({ mode, setMode }) {
             id: "update",
             label: "Complementar Registo",
             description:
-                "Atualiza um Registo Clínico com a informação pretendida, proveniente de análises clínicas."
+                "Atualiza um registo clínico com a informação pretendida, seja de análises e/ou instruções."
         },
         {
             id: "review",
@@ -34,7 +34,7 @@ export default function Sidebar({ mode, setMode }) {
             id: "qa",
             label: "Pesquisa em Documento",
             description:
-                "Permite colocar questões sobre um documento clínico e obter respostas."
+                "Permite obter infromação de um documento com uso de linguagem natural."
         }
     ];
 
