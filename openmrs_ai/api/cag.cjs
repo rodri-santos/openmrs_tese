@@ -18,11 +18,10 @@ function chunkText(text, chunkSize = 1500, overlap = 200) {
         chunks.push(text.slice(start, end));
         start += chunkSize - overlap;
     }
-
     return chunks;
 }
-// standard words to make rules
 
+// standard words to make rules
 function detectDocumentType(text) {
     const t = text.toLowerCase();
 
@@ -41,8 +40,8 @@ function detectDocumentType(text) {
     // ehr usually don't have these types of words, so having 3 of these will do probably for everything
     return matches >= 3 ? "MODULAB" : "RSE";
 }
-// LLM config
 
+// LLM config
 async function callLLM(prompt, temperature = 0.2) {
     const response = await fetch("http://localhost:11434/api/generate", {
         method: "POST",
@@ -67,11 +66,10 @@ async function callLLM(prompt, temperature = 0.2) {
         .replace(/<start_of_turn>/g, "")
         .replace(/=/g, "")
         .trim();
-
     return output;
 }
-// upload documents
 
+// upload documents
 async function uploadDocument(req, res) {
     try {
         const data = await pdfParser(req.file.buffer);
@@ -113,7 +111,6 @@ async function uploadDocument(req, res) {
 }
 
 // LLM context builders
-
 function buildRSEContext() {
     if (!currentRSE) return "";
     return currentRSE.chunks
@@ -131,194 +128,99 @@ function buildModulabContext() {
 function extractRelevantLabs(text) {
 
     if (!text) return "";
+    const keywords = [
+        "hemoglobina",
+        "leucócitos",
+        "leucocitos",
+        "neutrófilos",
+        "neutrofilos",
+        "linfócitos",
+        "linfocitos",
+        "monócitos",
+        "eosinófilos",
+        "basófilos",
+        "granulócitos imaturos",
+        "eritroblastos",
+        "eritrócitos",
+        "hematócrito",
+        "monocitos",
+        "eosinofilos",
+        "basofilos",
+        "granulocitos imaturos",
+        "eritrocitos",
+        "hematocrito",
+        "vcm",
+        "hcm",
+        "chcm",
+        "rdw",
+        "plaquetócrito",
+        "plaquetocrito",
+        "plaquetas",
+        "pdw",
+        "vpm",
+        "ureia",
+        "glicose",
+        "creatinina",
+        "sódio",
+        "potássio",
+        "sodio",
+        "potassio",
+        "cloro",
+        "cálcio total",
+        "calcio total",
+        "magnésio",
+        "magnesio",
+        "proteínas totais",
+        "proteinas totais",
+        "albumina",
+        "ácido úrico",
+        "acido urico",
+        "bilirrubina total",
+        "bilirrubina direta",
+        "fosfatase alcalina",
+        "TGO / AST",
+        "TGP / ALT",
+        "gama GT",
+        "lactato desidrogenase",
+    ];
+
     const lines = text.split("\n");
     const results = [];
-
-    function normalizeUnit(unit) {
-
-        if (!unit) return "";
-
-        return unit
-            .replace(/\s+/g, " ")
-            .replace(/10\s*\^?\s*3\s*\/\s*[µμu]L/gi, "mm3")
-            .replace(/10\s*\^?\s*3\s*[\/]?\s*[µμu]L/gi, "mm3")
-            .trim();
-    }
-
-    function extractValueAndUnit(line) {
-
-        const match = line.match(
-            /([0-9]+(?:[.,][0-9]+)?)\s*(10\s*\^?\s*3\s*\/\s*[µμu]L|10\s*\^?\s*3\s*[\/]?\s*[µμu]L|[%]|[a-zA-Zµμ]+(?:\/[a-zA-Zµμ]+)?)/i
-        );
-
-        if (!match) return null;
-
-        const value = match[1].replace(",", ".");
-        const unit = normalizeUnit(match[2]);
-
-        return {
-            value,
-            unit
-        };
-    }
-
-    for (const originalLine of lines) {
-        const line = originalLine.trim();
-        if (!line) continue;
+    for (const line of lines) {
         const lower = line.toLowerCase();
-
-        if (
-            lower.includes("neutrófilos") ||
-            lower.includes("neutrofilos")
-        ) {
-            const absoluteMatch = line.match(
-                /%\s*([0-9]+(?:[.,][0-9]+)?)\s*10\s*\^?\s*3\s*\/\s*[µμu]L/i
-            );
-            if (absoluteMatch) {
-                const value = absoluteMatch[1].replace(",", ".");
-                results.push(
-                    `Neutrófilos: ${value} mm3`
-                );
-                continue;
-            }
-        }
-
-        if (
-            lower.includes("leucócitos") ||
-            lower.includes("leucocitos")
-        ) {
-            const match = line.match(
-                /leuc[oó]citos\s*:?\s*([0-9]+(?:[.,][0-9]+)?)\s*10\s*\^?\s*3\s*\/\s*[µμu]L/i
-            );
-
-            if (match) {
-
-                const value = match[1].replace(",", ".");
-                results.push(
-                    `Leucócitos: ${value} mm3`
-                );
-                continue;
-            }
-        }
-
-        if (lower.includes("plaquetas")) {
-            const match = line.match(
-                /plaquetas\s*:?\s*([0-9]+(?:[.,][0-9]+)?)\s*10\s*\^?\s*3\s*\/\s*[µμu]L/i
-            );
-
-            if (match) {
-
-                const value = match[1].replace(",", ".");
-                results.push(
-                    `Plaquetas: ${value} mm3`
-                );
-                continue;
-            }
-        }
-
-        const keywords = [
-            "hemoglobina",
-            "linfócitos",
-            "linfocitos",
-            "monócitos",
-            "monocitos",
-            "eosinófilos",
-            "eosinofilos",
-            "basófilos",
-            "basofilos",
-            "granulócitos imaturos",
-            "granulocitos imaturos",
-            "eritroblastos",
-            "eritrócitos",
-            "eritrocitos",
-            "hematócrito",
-            "hematocrito",
-            "vcm",
-            "hcm",
-            "chcm",
-            "rdw",
-            "plaquetócrito",
-            "plaquetocrito",
-            "pdw",
-            "vpm",
-            "ureia",
-            "glicose",
-            "creatinina",
-            "sódio",
-            "sodio",
-            "potássio",
-            "potassio",
-            "cloro",
-            "cálcio total",
-            "calcio total",
-            "magnésio",
-            "magnesio",
-            "proteínas totais",
-            "proteinas totais",
-            "albumina",
-            "ácido úrico",
-            "acido urico",
-            "bilirrubina total",
-            "bilirrubina direta",
-            "fosfatase alcalina",
-            "tgo / ast",
-            "tgp / alt",
-            "gama gt",
-            "lactato desidrogenase"
-        ];
-
-
-        const matchedKeyword = keywords.find(
-            keyword => lower.includes(keyword)
-        );
-
+        const matchedKeyword = keywords.find(k => lower.includes(k));
         if (!matchedKeyword) continue;
-        const extracted = extractValueAndUnit(line);
-        if (!extracted) continue;
-        let name = matchedKeyword;
-
-        const names = {
-            "linfocitos": "Linfócitos",
-            "linfócitos": "Linfócitos",
-            "monocitos": "Monócitos",
-            "monócitos": "Monócitos",
-            "eosinofilos": "Eosinófilos",
-            "eosinófilos": "Eosinófilos",
-            "basofilos": "Basófilos",
-            "basófilos": "Basófilos",
-            "granulocitos imaturos": "Granulócitos imaturos",
-            "granulócitos imaturos": "Granulócitos imaturos",
-            "eritrocitos": "Eritrócitos",
-            "eritrócitos": "Eritrócitos",
-            "hematocrito": "Hematócrito",
-            "hematócrito": "Hematócrito",
-            "plaquetocrito": "Plaquetócrito",
-            "plaquetócrito": "Plaquetócrito",
-            "proteinas totais": "Proteínas totais",
-            "proteínas totais": "Proteínas totais",
-            "acido urico": "Ácido úrico",
-            "ácido úrico": "Ácido úrico",
-            "sodio": "Sódio",
-            "sódio": "Sódio",
-            "potassio": "Potássio",
-            "potássio": "Potássio"
-        };
-
-        if (names[matchedKeyword]) {
-            name = names[matchedKeyword];
-        } else {
-            name =
-                matchedKeyword.charAt(0).toUpperCase() +
-                matchedKeyword.slice(1);
-        }
-        results.push(
-            `${name}: ${extracted.value}${extracted.unit ? " " + extracted.unit : ""}`
+        const match = line.match(
+            /([0-9]+(?:[.,][0-9]+)?)\s*([0-9]*\^?[0-9]*\s*[a-zA-Zμ%\/\^\-]+(?:\/[a-zA-Z0-9]+)*)?/
         );
+        if (match) {
+            const value = match[1]?.replace(",", ".") || "";
+            let unit = (match[2] || "").trim();
+            unit = unit
+                .replace(/\s*\/\s*/g, "/")
+                .replace(/\s*\^\s*/g, "^")
+                .replace(/\s+/g, " ")
+                .trim();
+
+            let formatted = "";
+            if (unit === "%") {
+                formatted = `${matchedKeyword}: ${value}%`;
+            }
+            else if (unit.includes("10^")) {
+                formatted = `${matchedKeyword}: ${value} ${unit}`;
+            }
+            else {
+                formatted = `${matchedKeyword}: ${value} ${unit}`.trim();
+            }
+            results.push(formatted);
+        } else {
+            results.push(line.trim());
+        }
     }
     return results.join("\n");
 }
-// specific task prompt
 
+// specific task prompt
 async function generateDocument(req, res) {
 
     const instruction = req.body?.instruction || "";
@@ -342,7 +244,7 @@ Atualizar o Registo de Saúde Eletrónico (RSE) com base na instrução do utili
 REGRAS ABSOLUTAS:
 - Não inventes informação clínica
 - Não dês output das análises filtradas
-- Usa apenas dados presentes no RSE ou nas análises
+- Usa apenas dados presentes no RSE, nas análises ou na instrução do utilizador
 - Não explicas nada
 - Não comentas resultados
 - Não conversas
@@ -381,6 +283,7 @@ OUTPUT (APENAS RSE FINAL)
             success: true,
             result
         });
+
     } catch (err) {
         console.error("Generate error:", err);
         return res.status(500).json({
@@ -391,7 +294,6 @@ OUTPUT (APENAS RSE FINAL)
 }
 
 // session reset
-
 async function endSession(req, res) {
     currentRSE = null;
     modulabDocuments = [];
@@ -399,8 +301,8 @@ async function endSession(req, res) {
         success: true
     });
 }
-// session info
 
+// session info
 async function getSessionInfo(req, res) {
     return res.json({
         rse: currentRSE ? 1 : 0,
