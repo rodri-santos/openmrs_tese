@@ -75,7 +75,7 @@ export default function Sidebar({ mode, setMode }) {
                         key={item.id}
                         style={{
                             marginBottom: 14,
-                            borderRadius: 10,
+                            borderRadius: 0,
                             overflow: "hidden",
                             background: active ? "#2563eb" : "#374151",
                             transition: "all .25s"

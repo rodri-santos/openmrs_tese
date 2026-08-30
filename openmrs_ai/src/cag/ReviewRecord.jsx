@@ -55,7 +55,7 @@ export default function ReviewRecord() {
     const buttonStyle = {
         width: "100%",
         padding: "10px 16px",
-        borderRadius: 10,
+        borderRadius: 0,
         border: "1px solid #d1d5db",
         background: "white",
         cursor: "pointer",
@@ -79,7 +79,7 @@ export default function ReviewRecord() {
             <div
                 style={{
                     background: "white",
-                    borderRadius: 14,
+                    borderRadius: 0,
                     padding: 20,
                     boxShadow: "0 4px 14px rgba(0,0,0,.08)",
                     display: "flex",
@@ -139,7 +139,7 @@ export default function ReviewRecord() {
                         borderRadius: 10,
                         padding: 15,
                         fontFamily: "Arial",
-                        fontSize: 16,
+                        fontSize: 18,
                         lineHeight: 1.6,
                         minHeight: 0
                     }}
@@ -152,7 +152,7 @@ export default function ReviewRecord() {
             <div
                 style={{
                     background: "white",
-                    borderRadius: 14,
+                    borderRadius: 0,
                     padding: 20,
                     boxShadow: "0 4px 14px rgba(0,0,0,.08)",
                     display: "flex",
@@ -225,7 +225,7 @@ export default function ReviewRecord() {
                             style={{
                                 color: "#9ca3af",
                                 fontFamily: "Arial",
-                                fontSize: 16,
+                                fontSize: 18,
                                 fontWeight: "bold"
                             }}
                         >

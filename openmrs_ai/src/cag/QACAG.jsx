@@ -101,7 +101,7 @@ export default function QACAGPage() {
                     background: "white",
                     border: "1px solid #e5e7eb",
                     padding: 14,
-                    borderRadius: 12,
+                    borderRadius: 0,
                     marginBottom: 15
                 }}
             >
@@ -123,7 +123,7 @@ export default function QACAGPage() {
                     padding: 18,
                     background: "white",
                     border: "1px solid #e5e7eb",
-                    borderRadius: 12,
+                    borderRadius: 0,
                     minHeight: 0
                 }}
             >

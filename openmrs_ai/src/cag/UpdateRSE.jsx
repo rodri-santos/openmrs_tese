@@ -62,7 +62,7 @@ export default function UpdateRSE() {
 
     const panelStyle = {
         background: "#f8fafc",
-        borderRadius: 14,
+        borderRadius: 0,
         padding: 20,
         marginBottom: 16,
         border: "1px solid #e5e7eb"
@@ -84,9 +84,6 @@ export default function UpdateRSE() {
         background: "#1f2937"
     };
 
-    // ==============================
-    // UI
-    // ==============================
     return (
         <div
             style={{
@@ -139,7 +136,7 @@ export default function UpdateRSE() {
                                         fontSize: 12,
                                         background: "#e0f2fe",
                                         padding: "4px 8px",
-                                        borderRadius: 8,
+                                        borderRadius: 0,
                                         marginBottom: 6
                                     }}
                                 >
@@ -159,7 +156,7 @@ export default function UpdateRSE() {
                             fontSize: 20
                         }}
                     >
-                        Instrução Clínica
+                        Instruções
                     </h3>
 
                     <textarea
@@ -215,7 +212,7 @@ export default function UpdateRSE() {
                 <div
                     style={{
                         background: "white",
-                        borderRadius: 14,
+                        borderRadius: 0,
                         padding: 24,
                         width: "100%",
                         display: "flex",

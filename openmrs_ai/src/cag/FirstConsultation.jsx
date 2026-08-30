@@ -129,7 +129,7 @@ export default function FirstConsultation() {
 
     const panelStyle = {
         background: "#f8fafc",
-        borderRadius: 14,
+        borderRadius: 0,
         padding: 20,
         marginBottom: 16,
         border: "1px solid #e5e7eb"
@@ -190,13 +190,13 @@ export default function FirstConsultation() {
                             fontWeight: "bold"
                         }}
                     >
-                        Instruções
+                        Notas Clínicas
                     </h3>
 
                     <textarea
                         value={instruction}
                         onChange={(e) => setInstruction(e.target.value)}
-                        placeholder="Ex.: descrever antecedentes familiares, sintomas, medicação, agendamentos..."
+                        placeholder="Ex.: descrever antecedentes familiares, sintomas, medicação, ..."
                         style={{
                             flex: 1,
                             width: "100%",
@@ -243,7 +243,7 @@ export default function FirstConsultation() {
                 <div
                     style={{
                         background: "white",
-                        borderRadius: 14,
+                        borderRadius: 0,
                         padding: 24,
                         boxShadow: "0 4px 14px rgba(0,0,0,.08)",
                         display: "flex",
@@ -260,7 +260,7 @@ export default function FirstConsultation() {
                             fontWeight: "bold"
                         }}
                     >
-                        Registo Clínico
+                        Registo Clínico Gerado
                     </h3>
 
                     <textarea
