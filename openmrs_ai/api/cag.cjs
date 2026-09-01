@@ -53,7 +53,7 @@ async function callLLM(prompt, temperature = 0.2) {
             keep_alive: "20m",
             options: {
                 temperature,
-                num_predict: 1500
+                num_predict: 1800
             }
         })
     });
