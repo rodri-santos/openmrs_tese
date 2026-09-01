@@ -1,9 +1,10 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 
 import {
     uploadDocument,
-    generateDocument
+    generateDocument,
+    endSession
 } from "../services/cagService";
 
 export default function UpdateRSE() {
@@ -16,6 +17,11 @@ export default function UpdateRSE() {
     const [loadingGenerate, setLoadingGenerate] = useState(false);
     const [status, setStatus] = useState("");
 
+    useEffect(() => {
+        if (typeof endSession === "function") {
+            endSession().catch(err => console.error("Erro ao limpar sessão no refresh:", err));
+        }
+    }, []);
 
     const handleFileUpload = async (e) => {
 

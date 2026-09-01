@@ -11,10 +11,6 @@ export async function uploadDocument(file) {
     return res.json();
 }
 
-// =====================================================
-// GERAÇÃO COM INSTRUÇÃO (NOVA LÓGICA)
-// =====================================================
-
 export async function generateDocument(instruction) {
 
     const res = await fetch("http://localhost:3001/api/cag/generate", {
@@ -30,15 +26,12 @@ export async function generateDocument(instruction) {
     return res.json();
 }
 
-// =====================================================
-// SESSÃO
-// =====================================================
-
-export async function endCAGSession() {
-
-    return fetch("http://localhost:3001/api/cag/end-session", {
-        method: "POST"
+export async function endSession() {
+    const response = await fetch("http://localhost:3001/api/cag/end-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
     });
+    return await response.json();
 }
 
 export async function getSessionInfo() {
